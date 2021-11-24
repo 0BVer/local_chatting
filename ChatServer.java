@@ -14,7 +14,7 @@ public class ChatServer extends Thread{
 
     private static final int SALT_SIZE = 16;
     private static jdbc db = new jdbc();
-    user_ temp_USER = new user_();
+
     public ChatServer(Socket sock) {this.sock = sock;}
 
     public void remove(Socket socket){
@@ -33,6 +33,8 @@ public class ChatServer extends Thread{
         OutputStream toClient = null;
         ObjectInputStream fromClient_Obj;
         ObjectOutputStream toClient_Obj;
+
+        user_ temp_USER;
         command temp_COMMAND = null;
         String temp_string;
         try{
@@ -43,7 +45,7 @@ public class ChatServer extends Thread{
             while (true){ //채팅 수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
                 Object temp_Object = fromClient_Obj.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                 if (temp_Object instanceof user_){ //전달받은 객체가 사용자 타입일때
-                    user_ temp_USER = (user_) temp_Object;
+                    temp_USER = (user_) temp_Object;
                     if (temp_USER.login_== 0) { //클라이언트의 로그인 시도
                         if (get_User(temp_USER.ID_, temp_USER.PW_.getBytes())) {
                             toClient_Obj.writeObject(new command(1, true, "로그인 성공"));
@@ -76,18 +78,6 @@ public class ChatServer extends Thread{
                     System.out.println(temp_CHAT);
                 }
             }
-
-            //다른 클라이언트들에게 채팅을 전달하는 부분
-//            while ((count = fromClient.read(buf)) != -1){ //채팅 수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
-//                for (Socket s : ChatServer.clients){ //클라이언트 배열을 반복
-//                    if (sock != s){ //보낸 클라이언트를 제외하는 부분
-//                        toClient = s.getOutputStream();
-//                        toClient.write(buf, 0, count);
-//                        toClient.flush();
-//                    }
-//                }
-//                System.out.write(buf, 0, count);
-//            }
         } catch (IOException | ClassNotFoundException ex) {
             System.out.println(sock + ": 에러 (" + ex + ")");
         } catch (Exception ex) {

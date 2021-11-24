@@ -46,15 +46,6 @@ public class jdbc {
             Table user = new Table("user");
             Table chat = new Table("chat");
 
-//            String ID_ = "joon5", PW_ = "1111";
-//            Select_All(user);
-//            Insert_Delete_chat(1, ID_, "Hello World");
-//            Select_All(chat);
-
-//            User user_ = new User();
-//            user_.set_User(ID_, PW_.getBytes());
-//            user_.get_User(ID_, PW_.getBytes());
-
             result.close();
             state.close();
             con.close();
@@ -95,7 +86,7 @@ public class jdbc {
             return "등록에 성공했습니다.";
 
         } catch (SQLException ex){
-            return "실패 : 중복된 ID가 이미 있습니다." + ex.getMessage();
+            return "실패 : 중복된 ID가 이미 있습니다.";
         }
     }
 
