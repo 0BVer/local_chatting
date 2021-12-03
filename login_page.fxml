@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.PasswordField?>
 <AnchorPane prefHeight="950.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="chat.LoginUi">
+            fx:controller="chat.CLIENT_UI_CONTROLLER">
     <Pane prefHeight="950.0" prefWidth="550.0">
         <children>
             <HBox alignment="TOP_RIGHT" prefHeight="45.0" prefWidth="550.0">
@@ -28,19 +28,32 @@
                     </Pane>
                     <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: c4c4c4;">
                         <children>
-                            <Button prefHeight="45.0" prefWidth="70.0" onAction="#MINIMIZE_WIN" style="-fx-background-color: c4c4c4;"></Button>
+                            <!--                            <Button prefHeight="45.0" prefWidth="70.0" fx:id="MINIMIZE_BT" style="-fx-background-color: c4c4c4;"></Button>-->
                             <Line endX="40.0" endY="23.0" startX="30.0" startY="23.0" stroke="#303030"/>
                         </children>
                     </Pane>
                     <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: E76666;">
                         <children>
-                            <Button prefHeight="45.0" prefWidth="70.0" onAction="#CLOSE_WIN" style="-fx-background-color: E76666;"></Button>
+                            <!--                            <Button prefHeight="45.0" prefWidth="70.0" fx:id="CLOSE_BT" style="-fx-background-color: E76666;"></Button>-->
                             <Line endX="40.0" endY="30.0" startX="30.0" startY="15.0" stroke="#303030"/>
                             <Line endX="40.0" endY="15.0" startX="30.0" startY="30.0" stroke="#303030"/>
                         </children>
                     </Pane>
                 </children>
             </HBox>
+            <Text fill="#2f2f2f" layoutX="155.0" layoutY="290.0" strokeType="OUTSIDE" strokeWidth="0.0" text="환영합니다"
+                  textAlignment="CENTER">
+                <font>
+                    <Font size="48.0"/>
+                </font>
+            </Text>
+            <Text fill="#E76666" layoutX="155.0" layoutY="650.0" fx:id="WARNING_MSG" strokeType="OUTSIDE"
+                  visible="false" strokeWidth="0.0" text="ERROR"
+                  textAlignment="CENTER">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Text>
             <Pane layoutX="85.0" layoutY="340.0" prefHeight="70.0" prefWidth="380.0"
                   style="-fx-background-color: #F3F3F3;">
                 <children>
@@ -50,9 +63,6 @@
                         <font>
                             <Font size="18.0"/>
                         </font>
-                        <cursor>
-                            <Cursor fx:constant="DEFAULT"/>
-                        </cursor>
                     </TextField>
                 </children>
             </Pane>
@@ -62,6 +72,18 @@
                     <PasswordField layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
                                    prefWidth="340.0" promptText="PW" fx:id="TXT_PW"
                                    style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
+                        <font>
+                            <Font size="18.0"/>
+                        </font>
+                    </PasswordField>
+                </children>
+            </Pane>
+            <Pane layoutX="85.0" layoutY="540.0" prefHeight="70.0" prefWidth="380.0"
+                  style="-fx-background-color: #F3F3F3;">
+                <children>
+                    <PasswordField layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
+                                   prefWidth="340.0" promptText="PW Confirm" fx:id="TXT_PW_CF" visible="false"
+                                   style="-fx-alignment: center; -fx-background-color: #D4D4D4;">
                         <font>
                             <Font size="18.0"/>
                         </font>
@@ -83,24 +105,6 @@
                     <Font size="18.0"/>
                 </font>
             </Button>
-            <Pane layoutX="85.0" layoutY="540.0" prefHeight="70.0" prefWidth="380.0"
-                  style="-fx-background-color: #F3F3F3;">
-                <children>
-                    <PasswordField layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
-                                   prefWidth="340.0" promptText="PW Confirm" fx:id="TXT_PW_CF" visible="false"
-                                   style="-fx-alignment: center; -fx-background-color: #D4D4D4;">
-                        <font>
-                            <Font size="18.0"/>
-                        </font>
-                    </PasswordField>
-                </children>
-            </Pane>
-            <Text fill="#2f2f2f" layoutX="155.0" layoutY="290.0" strokeType="OUTSIDE" strokeWidth="0.0" text="환영합니다"
-                  textAlignment="CENTER">
-                <font>
-                    <Font size="48.0"/>
-                </font>
-            </Text>
         </children>
     </Pane>
 </AnchorPane>

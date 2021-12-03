@@ -72,7 +72,7 @@ public class jdbc {
             return "";
 
         } catch (SQLException ex){
-            return "실패 : 중복된 ID가 이미 있습니다." + ex.getMessage();
+            return "중복된 ID가 이미 있습니다.";
         }
     }
 
@@ -86,7 +86,7 @@ public class jdbc {
             return "등록에 성공했습니다.";
 
         } catch (SQLException ex){
-            return "실패 : 중복된 ID가 이미 있습니다.";
+            return "실패 : ID를 찾을 수 없습니다.";
         }
     }
 

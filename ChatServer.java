@@ -51,7 +51,7 @@ public class ChatServer extends Thread{
                             toClient_Obj.writeObject(new command(1, true, "로그인 성공"));
                             System.out.println(sock + " : 로그인 성공");
                         } else {
-                            toClient_Obj.writeObject(new command(1, false, "로그인 실패"));
+                            toClient_Obj.writeObject(new command(1, false, "ID 또는 PW를 확인해 주세요."));
                             System.out.println(sock + " : 로그인 실패");
                         }
                     } else if (temp_USER.login_== 2) { //클라이언트의 등록 시도

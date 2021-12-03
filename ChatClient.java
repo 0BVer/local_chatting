@@ -71,19 +71,16 @@ public class ChatClient {
             while (true) {
                 if (!Login_now) {
                     System.out.println(fromServer_Obj_login.available());
-                    USER = new user_();
                     System.out.println("로그인 : 1, 등록 : 2");
 
                     if (s.nextInt() == 2) USER.login_ = 2; //등록으로 선택시 유저 객체의 로그인 시도를 등록 시도로 변경
                     else USER.login_ = 0;
 
                     System.out.println("ID를 입력해 주세요");
-                    USER.ID_ = s.next();
+                    String temp_ID_ = s.next();
                     System.out.println("PW를 입력해 주세요");
-//                    USER.PW_ = new byte[]{1};
-                    USER.setPW_(s.next().getBytes());
 
-                    toServer_Obj.writeObject(USER);
+                    toServer_Obj.writeObject(new user_(temp_ID_, s.next(), 0));
                     toServer_Obj.flush();
 
                     Object temp_Object = fromServer_Obj_login.readObject();
