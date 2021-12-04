@@ -75,13 +75,15 @@
     </Pane>
     <Pane fx:id="CHAT_PANE" layoutY="45.0" prefHeight="905.0" prefWidth="550.0" style="-fx-background-color: #2F2F2F;" visible="false">
         <children>
-         <Pane layoutX="20.0" layoutY="15.0" prefHeight="45.0" prefWidth="440.0" style="-fx-background-color: #434343;">
+         <Pane fx:id="CHAT_BG" layoutX="20.0" layoutY="15.0" prefHeight="45.0" prefWidth="440.0" style="-fx-background-color: #434343;">
             <children>
                <Text fx:id="PARTY_MSG" fill="WHITE" layoutX="14.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="참가자">
                   <font>
                      <Font size="14.0" />
                   </font>
                </Text>
+               <Button layoutX="350.0" layoutY="7.0" mnemonicParsing="false" onAction="#SAVE_CHAT" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="저장하기" textFill="#303030" visible="false" />
+               <Button fx:id="SILENT_BT" layoutX="250.0" layoutY="7.0" mnemonicParsing="false" onAction="#SILENT_MODE" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="귓속말" textFill="#303030" visible="false" />
             </children>
          </Pane>
          <ScrollPane fx:id="SCROLL_PANE" fitToWidth="true" layoutX="20.0" layoutY="80.0" prefHeight="635.0" prefWidth="515.0" style="-fx-background-color: #2f2f2f; -fx-background: #2f2f2f;">
@@ -105,6 +107,15 @@
                   </cursor>
                </Button>
             </children>
+         </Pane>
+         <Pane fx:id="MENU_CLOSE_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;" visible="false">
+            <children>
+               <Line endX="33.0" endY="29.0" startX="17.0" startY="17.0" stroke="WHITE" />
+               <Line endX="33.0" endY="17.0" startX="17.0" startY="29.0" stroke="WHITE" />
+            </children>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
          </Pane>
          <Pane fx:id="MENU_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;">
             <children>
@@ -131,7 +142,6 @@
               </Pane>
               <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: c4c4c4;">
                   <children>
-                      <!--                            <Button prefHeight="45.0" prefWidth="70.0" fx:id="MINIMIZE_BT" style="-fx-background-color: c4c4c4;"></Button>-->
                       <Line endX="40.0" endY="23.0" startX="30.0" startY="23.0" stroke="#303030" />
                   </children>
             <cursor>
@@ -140,7 +150,6 @@
               </Pane>
               <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: E76666;">
                   <children>
-                      <!--                            <Button prefHeight="45.0" prefWidth="70.0" fx:id="CLOSE_BT" style="-fx-background-color: E76666;"></Button>-->
                       <Line endX="40.0" endY="30.0" startX="30.0" startY="15.0" stroke="#303030" />
                       <Line endX="40.0" endY="15.0" startX="30.0" startY="30.0" stroke="#303030" />
                   </children>

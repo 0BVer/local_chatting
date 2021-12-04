@@ -19,9 +19,9 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 
@@ -34,6 +34,8 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     public TextArea TXT_CHAT;
     public VBox CHAT_BOX;
     public ScrollPane SCROLL_PANE;
+    public Text TITLE_MSG;
+    public Text PARTY_MSG;
 
     @FXML
     TextField TXT_ID;
@@ -49,7 +51,8 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     chat_ temp_CHAT;
     String USER_ID = "";
 
-    LinkedList<Pane> CHAT_LIST = new LinkedList();
+    LinkedList<chat_> CHAT_LIST = new LinkedList();
+    ArrayList<String> Participant = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -72,30 +75,45 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         temp_COMMAND = (command) temp_Object;
                         if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
                             if (temp_COMMAND.state) {
-                                USER_ID = temp_COMMAND.message;
+                                USER_ID = TXT_ID.getText();
+                                for (String s : temp_COMMAND.message){
+                                    Participant.add(s);
+                                }
                                 LOGIN_NOW = true;
                                 Platform.runLater(() -> {
                                     try {
                                         CHANGE_SCENE();
+                                        PARTY_MSG.setText(Participant.toString().substring(1, Participant.toString().length() - 1));
                                     } catch (IOException e) {
                                     }
                                 });
                             } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
+                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
                             }
                         } else if (temp_COMMAND.command_type == 2) { //클라이언트의 등록에 대한 응답
                             if (temp_COMMAND.state) {
                                 Platform.runLater(() -> WARNING_MSG.setText("가입에 성공하였습니다."));
                             } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
+                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
+                            }
+                        } else if (temp_COMMAND.command_type == 3) {
+                            if (temp_COMMAND.state) {
+                                Participant.add(temp_COMMAND.message[0]);
+                                Platform.runLater(() -> PARTY_MSG.setText(Participant.toString()));
+                            } else {
+                                Participant.remove(temp_COMMAND.message[0]);
+                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
                             }
                         }
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                         temp_CHAT = (chat_) temp_Object;
-                        if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
-                            Platform.runLater(() -> create_CHAT_BOX_(true, temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                        CHAT_LIST.addFirst(temp_CHAT);
+                        if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
+                            Platform.runLater(() -> create_CHAT_BOX_(0, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                        else if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
+                            Platform.runLater(() -> create_CHAT_BOX_(1, temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                         else
-                            Platform.runLater(() -> create_CHAT_BOX_(false, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                            Platform.runLater(() -> create_CHAT_BOX_(2, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
@@ -175,7 +193,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         TXT_CHAT.setText("");
     }
 
-    public void create_CHAT_BOX_(boolean myCHAT, String ID_DATE, String CHAT_) {
+    public void create_CHAT_BOX_(int SENDER, String ID_DATE, String CHAT_) {
         Text ID_DATE_FIELD = new Text(ID_DATE);
         ID_DATE_FIELD.setLayoutX(13);
         ID_DATE_FIELD.setLayoutY(19);
@@ -192,14 +210,17 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         IN_PANE.setPrefHeight(37 + CHAT_FIELD.getLayoutBounds().getHeight());
         IN_PANE.setPrefWidth(425);
 
-        if (myCHAT) {
+        if (SENDER == 0) {
+            IN_PANE.setPrefWidth(500);
+            IN_PANE.setStyle("-fx-background-color: #C4C4C4;");
+        } else if (SENDER == 1) {
             ID_DATE_FIELD.setFill(Paint.valueOf("WHITE"));
             ID_DATE_FIELD.setTextAlignment(TextAlignment.valueOf("RIGHT"));
             CHAT_FIELD.setFill(Paint.valueOf("WHITE"));
             CHAT_FIELD.setTextAlignment(TextAlignment.valueOf("RIGHT"));
             IN_PANE.setLayoutX(75);
             IN_PANE.setStyle("-fx-background-color: #434343;");
-        } else {
+        } else if (SENDER == 2) {
             IN_PANE.setStyle("-fx-background-color: #C4C4C4;");
         }
 
@@ -207,9 +228,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         OUT_PANE.setPrefHeight(10 + IN_PANE.getPrefHeight());
         OUT_PANE.setPrefWidth(500);
         OUT_PANE.setStyle("-fx-background-color: #2F2F2F;");
-        CHAT_LIST.addLast(OUT_PANE);
-
-        CHAT_BOX.getChildren().add(CHAT_LIST.getLast());
+        CHAT_BOX.getChildren().add(OUT_PANE);
         CHAT_BOX.setPrefHeight(CHAT_BOX.getPrefHeight() + OUT_PANE.getPrefHeight());
     }
 }

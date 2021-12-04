@@ -36,9 +36,14 @@ public class jdbc {
             //       java.sql.Connection 규격에 따라 만든 객체이다.
 
             con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
-                    "root", /* 해당 DB를 사용할 수 있는 아이디*/
-                    "1234" /* 사용자 암호 */);
+                    "jdbc:mysql://112.175.184.78:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
+                    "dr0joon", /* 해당 DB를 사용할 수 있는 아이디*/
+                    "Roqlqkr4%" /* 사용자 암호 */);
+
+//            con = DriverManager.getConnection(
+//                    "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
+//                    "root", /* 해당 DB를 사용할 수 있는 아이디*/
+//                    "1234" /* 사용자 암호 */);
 
             // 4) 연결이 되었다는 걸 표시
             System.out.println("DBMS와 연결되었음!");
@@ -58,9 +63,9 @@ public class jdbc {
         }
     }
 
-//    public static void main(String[] args) {
-//        new jdbc();
-//    }
+    public static void main(String[] args) {
+        new jdbc();
+    }
 
     public String Insert_user(String ID_, String PW_, String Salt_) throws SQLException {
         try {

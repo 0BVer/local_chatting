@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
@@ -77,19 +78,18 @@ public class ChatClient_v2 {
         Scanner s = new Scanner(System.in);
         boolean Restart = false;
         boolean Login_Now = false;
+        int REG = 0;
         String temp_message;
         InputStream fromServer = null;
-
-        CLIENT_UI CU = new CLIENT_UI();
-        CU.main(args);
+        String TEMP_ID = null;
 
         try {
             user_ USER = null;
 
             while (true) {
                 System.out.println("로그인 : 1, 등록 : 2");
-                if (s.nextInt() == 2) USER.login_ = 2; //등록으로 선택시 유저 객체의 로그인 시도를 등록 시도로 변경
-                else USER.login_ = 0;
+                if (s.nextInt() == 2) REG = 2; //등록으로 선택시 유저 객체의 로그인 시도를 등록 시도로 변경
+                else REG = 0;
 
                 sock = new Socket("localhost", 8888);
                 System.out.println(sock + ": 연결됨");
@@ -103,7 +103,7 @@ public class ChatClient_v2 {
                 String temp_ID_ = s.next();
                 System.out.println("PW를 입력해 주세요");
 
-                toServer_Obj.writeObject(new user_(temp_ID_, s.next(), 0));
+                toServer_Obj.writeObject(new user_(temp_ID_, s.next(), REG));
                 toServer_Obj.flush();
 
                 Object temp_Object = fromServer_Obj_login.readObject();
@@ -113,18 +113,14 @@ public class ChatClient_v2 {
                     if (!temp_COMMAND.state) {
                         System.out.println("다시 시도해 주시길 바랍니다.");
                         sock.close();
-//                            if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
-//                                System.out.println(temp_COMMAND.message);
-//                            } else if (temp_COMMAND.command_type == 2) { //클라이언트의 등록에 대한 응답
-//                                System.out.println(temp_COMMAND.message);
-//                            }
                     } else if (temp_COMMAND.command_type == 1 && temp_COMMAND.state) { //로그인에 성공했을때
-                        USER.login_ = 1;
+//                        USER.login_ = 1;
+                        TEMP_ID = temp_COMMAND.message[0];
                         Login_Now = true;
                         temp_COMMAND = null;
                         fromServer_Obj_login.close();
                         chandler.start(); //서버에서 보내오는 값을 받기 위한 쓰레드 실행
-                        System.out.println(USER.ID_ + "님 채팅방에 오신걸 환영합니다. 텍스트를 입력해 주세요");
+//                        System.out.println(USER.ID_ + "님 채팅방에 오신걸 환영합니다. 텍스트를 입력해 주세요");
                     }
                 }
                 while (Login_Now) {
@@ -134,7 +130,7 @@ public class ChatClient_v2 {
                         System.out.println("정상적으로 로그아웃 되었습니다.");
                         sock.close();
                     }
-                    toServer_Obj.writeObject(new chat_(USER.ID_, temp_message, LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd HH:mm"))));
+                    toServer_Obj.writeObject(new chat_(TEMP_ID, temp_message, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
                     toServer_Obj.flush();
                 }
             }
