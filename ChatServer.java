@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ChatServer extends Thread{
@@ -39,6 +41,7 @@ public class ChatServer extends Thread{
         String temp_string;
         try{
             System.out.println(sock + ": 연결됨");
+
             fromClient_Obj = new ObjectInputStream(sock.getInputStream()); //InputStream의 최종 형식을 Object로 설정해줍니다.
             toClient_Obj = new ObjectOutputStream(sock.getOutputStream());
 
@@ -48,7 +51,7 @@ public class ChatServer extends Thread{
                     temp_USER = (user_) temp_Object;
                     if (temp_USER.login_== 0) { //클라이언트의 로그인 시도
                         if (get_User(temp_USER.ID_, temp_USER.PW_.getBytes())) {
-                            toClient_Obj.writeObject(new command(1, true, "로그인 성공"));
+                            toClient_Obj.writeObject(new command(1, true, temp_USER.ID_));
                             System.out.println(sock + " : 로그인 성공");
                         } else {
                             toClient_Obj.writeObject(new command(1, false, "ID 또는 PW를 확인해 주세요."));
@@ -57,17 +60,16 @@ public class ChatServer extends Thread{
                     } else if (temp_USER.login_== 2) { //클라이언트의 등록 시도
                         temp_string = set_User(temp_USER.ID_, temp_USER.PW_.getBytes());
                         if (temp_string == "") {
-                            toClient_Obj.writeObject(new command(1, true, "등록 성공"));
+                            toClient_Obj.writeObject(new command(2, true, "등록 성공"));
                             System.out.println(sock + " : 등록 성공");
                         } else {
-                            toClient_Obj.writeObject(new command(1, false, temp_string));
+                            toClient_Obj.writeObject(new command(2, false, temp_string));
                             System.out.println(sock + " : " + temp_string);
                         }
                     }
                 } else if (temp_Object instanceof chat_){ //전달받은 객체가 채팅타입일 때
                     chat_ temp_CHAT = (chat_) temp_Object;
-
-                    db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_);
+                    db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_);
                     for (Socket s : ChatServer.clients){ //클라이언트 배열을 반복
                         if (sock != s){ //보낸 클라이언트를 제외하는 부분
                             ObjectOutputStream toOtherClient_Obj = new ObjectOutputStream(s.getOutputStream());
@@ -75,6 +77,7 @@ public class ChatServer extends Thread{
                             toClient_Obj.flush();
                         }
                     }
+                    toClient_Obj.writeObject(temp_CHAT);
                     System.out.println(temp_CHAT);
                 }
             }
@@ -108,7 +111,6 @@ public class ChatServer extends Thread{
 
             ChatServer myServer = new ChatServer(client);
             myServer.start();
-
         }
     }
 
@@ -121,8 +123,6 @@ public class ChatServer extends Thread{
     // 새로운 계정 만들기
     String set_User(String ID_, byte[] Password) throws Exception {
         String SALT = getSALT();
-        System.out.println("SALT");
-        System.out.println(SALT);
         return db.Insert_user(ID_, Hashing(Password, SALT), SALT);
     }
 

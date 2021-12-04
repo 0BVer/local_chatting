@@ -3,6 +3,8 @@ package chat;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 class ServerHandler extends Thread {
@@ -145,7 +147,7 @@ public class ChatClient {
                         }
                         continue;
                     }
-                    toServer_Obj.writeObject(new chat_(USER.ID_, temp_message));
+                    toServer_Obj.writeObject(new chat_(USER.ID_, temp_message, LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd HH:mm"))));
                     toServer_Obj.flush();
                 }
             }

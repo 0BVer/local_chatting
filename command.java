@@ -20,11 +20,6 @@ class chat_ implements Serializable {
     String chat_TEXT_ = "";
     String upload_TIME_ = "";
 
-    chat_(String ID_, String chat_TEXT_){
-        this.ID_ = ID_;
-        this.chat_TEXT_ = chat_TEXT_;
-    }
-
     chat_(String ID_, String chat_TEXT_, String upload_TIME_){
         this.ID_ = ID_;
         this.chat_TEXT_ = chat_TEXT_;
