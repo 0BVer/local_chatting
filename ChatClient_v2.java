@@ -115,7 +115,7 @@ public class ChatClient_v2 {
                         sock.close();
                     } else if (temp_COMMAND.command_type == 1 && temp_COMMAND.state) { //로그인에 성공했을때
 //                        USER.login_ = 1;
-                        TEMP_ID = temp_COMMAND.message[0];
+                        TEMP_ID = temp_COMMAND.message;
                         Login_Now = true;
                         temp_COMMAND = null;
                         fromServer_Obj_login.close();

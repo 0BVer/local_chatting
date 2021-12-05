@@ -5,13 +5,15 @@ import javafx.beans.binding.Bindings;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
-public class command implements Serializable{
+public class command implements Serializable {
     int command_type;
     boolean state;
-    String[] message;
-    command(int command_type, boolean state, String[] message){
+    String message;
+
+    command(int command_type, boolean state, String message) {
         this.command_type = command_type;
         this.state = state;
         this.message = message;
@@ -22,31 +24,33 @@ class chat_ implements Serializable {
     String ID_ = "unknown";
     String chat_TEXT_ = "";
     String upload_TIME_ = "";
-    boolean SILENT_CHAT = false;
-    String[] SILENT = new String[10];
+    String SILENT = "";
 
-    chat_(String ID_, String chat_TEXT_, String upload_TIME_){
+    chat_(String ID_, String chat_TEXT_, String upload_TIME_) {
         this.ID_ = ID_;
         this.chat_TEXT_ = chat_TEXT_;
         this.upload_TIME_ = upload_TIME_;
     }
 
-    chat_(String ID_, String chat_TEXT_, String upload_TIME_, boolean SILENT_CHAT, String[] SILENT){
+    chat_(String ID_, String chat_TEXT_, String upload_TIME_, String SILENT) {
         this.ID_ = ID_;
         this.chat_TEXT_ = chat_TEXT_;
         this.upload_TIME_ = upload_TIME_;
-        this.SILENT_CHAT = SILENT_CHAT;
         this.SILENT = SILENT;
     }
 
     @Override
     public String toString() {
-        return "chat_{" +
-                "ID:" + ID_ + '\'' +
-                ", TIME: " + upload_TIME_ + '\'' +
-                ", TEXT: " + chat_TEXT_ + '\'' +
-                ", SILENT=" + Arrays.toString(SILENT) +
-                '}';
+        if (SILENT.compareTo("") != 0)
+            return "[" + ID_ + " -> " + SILENT +
+                    " | " + chat_TEXT_ +
+                    " | " + upload_TIME_ +
+                    ']';
+        else
+            return "[" + ID_ +
+                    " | " + chat_TEXT_ +
+                    " | " + upload_TIME_ +
+                    ']';
     }
 }
 
@@ -88,5 +92,30 @@ class user_ implements Serializable {
                 ", PW_='" + PW_ + '\'' +
                 ", login_=" + login_ +
                 '}';
+    }
+}
+
+class login_users implements Serializable {
+    String ID_ = "";
+    boolean state;
+    ArrayList<String> users_ID_ = new ArrayList(10);
+
+    login_users(String ID_, boolean state, ArrayList users_ID_) {
+        this.ID_ = ID_;
+        this.state = state;
+        this.users_ID_ = users_ID_;
+    }
+
+    @Override
+    public String toString() {
+        String temp = "";
+        int count = 0;
+        for (String user : users_ID_) {
+            if (user.length() > 0) {
+                temp += user + ", ";
+                count++;
+            }
+        }
+        return String.format("Online [%d/10] ", count) + temp.substring(0, temp.length() - 2);
     }
 }

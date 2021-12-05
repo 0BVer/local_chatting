@@ -49,6 +49,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     ObjectOutputStream toServer_Obj;
     command temp_COMMAND;
     chat_ temp_CHAT;
+    login_users temp_LOGIN_USERS;
     String USER_ID = "";
 
     LinkedList<chat_> CHAT_LIST = new LinkedList();
@@ -57,6 +58,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+//            sock = new Socket("creater.iptime.org", 58088);
             sock = new Socket("localhost", 8888);
             toServer_Obj = new ObjectOutputStream(sock.getOutputStream());
         } catch (IOException e) {
@@ -76,9 +78,6 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
                             if (temp_COMMAND.state) {
                                 USER_ID = TXT_ID.getText();
-                                for (String s : temp_COMMAND.message){
-                                    Participant.add(s);
-                                }
                                 LOGIN_NOW = true;
                                 Platform.runLater(() -> {
                                     try {
@@ -88,21 +87,13 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                                     }
                                 });
                             } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
+                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
                             }
                         } else if (temp_COMMAND.command_type == 2) { //클라이언트의 등록에 대한 응답
                             if (temp_COMMAND.state) {
                                 Platform.runLater(() -> WARNING_MSG.setText("가입에 성공하였습니다."));
                             } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
-                            }
-                        } else if (temp_COMMAND.command_type == 3) {
-                            if (temp_COMMAND.state) {
-                                Participant.add(temp_COMMAND.message[0]);
-                                Platform.runLater(() -> PARTY_MSG.setText(Participant.toString()));
-                            } else {
-                                Participant.remove(temp_COMMAND.message[0]);
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message[0]));
+                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
                             }
                         }
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
@@ -110,10 +101,19 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         CHAT_LIST.addFirst(temp_CHAT);
                         if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
                             Platform.runLater(() -> create_CHAT_BOX_(0, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
-                        else if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
-                            Platform.runLater(() -> create_CHAT_BOX_(1, temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+//                        else if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
+//                            Platform.runLater(() -> create_CHAT_BOX_(1, temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                         else
                             Platform.runLater(() -> create_CHAT_BOX_(2, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                    } else if (temp_Object instanceof login_users) {
+                        temp_LOGIN_USERS = (login_users) temp_Object;
+                        if (temp_LOGIN_USERS.state) {
+                            Participant.add(temp_LOGIN_USERS.ID_);
+                            Platform.runLater(() -> PARTY_MSG.setText(temp_LOGIN_USERS.toString()));
+                        } else {
+                            Participant.remove(temp_LOGIN_USERS.ID_);
+                            Platform.runLater(() -> PARTY_MSG.setText(temp_LOGIN_USERS.toString()));
+                        }
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
@@ -186,11 +186,17 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     }
 
     public void SEND_CHAT(ActionEvent actionEvent) throws IOException {
+        String time_;
         if (TXT_CHAT.getText().length() > 0) {
-            toServer_Obj.writeObject(new chat_(USER_ID, TXT_CHAT.getText(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
+            time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
+            toServer_Obj.writeObject(new chat_(USER_ID, TXT_CHAT.getText(), time_));
             toServer_Obj.flush();
+            Platform.runLater(() -> {
+                create_CHAT_BOX_(1, time_, TXT_CHAT.getText());
+                TXT_CHAT.setText("");
+            });
+
         }
-        TXT_CHAT.setText("");
     }
 
     public void create_CHAT_BOX_(int SENDER, String ID_DATE, String CHAT_) {
@@ -230,5 +236,11 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         OUT_PANE.setStyle("-fx-background-color: #2F2F2F;");
         CHAT_BOX.getChildren().add(OUT_PANE);
         CHAT_BOX.setPrefHeight(CHAT_BOX.getPrefHeight() + OUT_PANE.getPrefHeight());
+    }
+
+    public void SAVE_CHAT(ActionEvent actionEvent) {
+    }
+
+    public void SILENT_MODE(ActionEvent actionEvent) {
     }
 }

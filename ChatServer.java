@@ -59,7 +59,7 @@ public class ChatServer extends Thread {
         for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
             if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                 ObjectOutputStream toOtherClient_Obj = new ObjectOutputStream(d.Client_sock.getOutputStream());
-                toOtherClient_Obj.writeObject(new command(3, connect_, new String[]{ID_}));
+                toOtherClient_Obj.writeObject(new login_users(ID_, connect_, ChatServer.Particiants));
                 toClient_echo.flush();
             }
         }
@@ -89,29 +89,26 @@ public class ChatServer extends Thread {
                     if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
                         if (get_User(temp_USER.ID_, temp_USER.PW_.getBytes())) {
 
+                            Client_DATA.login_NOW = true;
+                            ChatServer.Client_DATA.USER_ID = temp_USER.ID_;
                             ChatServer.Particiants.add(temp_USER.ID_);
-                            String[] P_array = new String[Particiants.size()];
-                            int size = 0;
-                            for (String temp : Particiants)
-                                if (temp != null) P_array[size++] = temp;
-
-                            toClient_Obj.writeObject(new command(1, true, P_array));
-                            Client_DATA.USER_ID = temp_USER.ID_;
+                            toClient_Obj.writeObject(new command(1, true, ""));
+                            toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
 
                             ECHO_CONNECT(temp_USER.ID_, true, toClient_Obj);
                             System.out.println(sock + " : 로그인 성공");
                         } else {
-                            toClient_Obj.writeObject(new command(1, false, new String[]{"ID 또는 PW를 확인해 주세요."}));
+                            toClient_Obj.writeObject(new command(1, false, "ID 또는 PW를 확인해 주세요."));
                             System.out.println(sock + " : 로그인 실패");
                         }
                     } else if (temp_USER.login_ == 2) { //클라이언트의 등록 시도
                         temp_string = set_User(temp_USER.ID_, temp_USER.PW_.getBytes());
 
                         if (temp_string == "") {
-                            toClient_Obj.writeObject(new command(2, true, new String[]{"등록 성공"}));
+                            toClient_Obj.writeObject(new command(2, true, "등록 성공"));
                             System.out.println(sock + " : 등록 성공");
                         } else {
-                            toClient_Obj.writeObject(new command(2, false, new String[]{temp_string}));
+                            toClient_Obj.writeObject(new command(2, false, temp_string));
                             System.out.println(sock + " : " + temp_string);
                         }
                     }
@@ -120,7 +117,7 @@ public class ChatServer extends Thread {
 
                     db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_);
 
-                    if (!temp_CHAT.SILENT_CHAT) {
+                    if (temp_CHAT.SILENT.compareTo("") == 0) {
                         for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                             if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                                 ObjectOutputStream toOtherClient_Obj = new ObjectOutputStream(d.Client_sock.getOutputStream());
@@ -128,39 +125,37 @@ public class ChatServer extends Thread {
                                 toClient_Obj.flush();
                             }
                         }
-                        toClient_Obj.writeObject(temp_CHAT);
+//                        toClient_Obj.writeObject(temp_CHAT);
                         System.out.println(temp_CHAT);
-                    } else {
-                        for (String u : temp_CHAT.SILENT) { //귓속말 상대 배열 반복
-                            boolean isThere = false;
-                            for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
-                                if (sock != d.Client_sock && u == d.USER_ID) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
-                                    ObjectOutputStream toOtherClient_Obj = new ObjectOutputStream(d.Client_sock.getOutputStream());
-                                    toOtherClient_Obj.writeObject(temp_CHAT);
-                                    toClient_Obj.flush();
-                                    isThere = true;
-                                    break;
-                                }
+                    } else {//귓속말 상대 배열 반복
+                        boolean isntThere = true;
+                        for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
+                            if (sock != d.Client_sock && temp_CHAT.SILENT == d.USER_ID) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
+                                ObjectOutputStream toOtherClient_Obj = new ObjectOutputStream(d.Client_sock.getOutputStream());
+                                toOtherClient_Obj.writeObject(temp_CHAT);
+                                toClient_Obj.flush();
+                                isntThere = false;
+                                break;
                             }
-                            if (!isThere) temp_string += u + ", ";
                         }
-                        if (temp_string != "") {
-                            toClient_Obj.writeObject(new chat_("SERVER ALERT", temp_string.substring(0, temp_string.length() - 2) + "를 서버에서 찾을 수 없습니다.", "", true, new String[]{Client_DATA.USER_ID}));
-                            temp_string = "";
+                        if (isntThere) {
+                            toClient_Obj.writeObject(new chat_(Client_DATA.USER_ID, "상대방을 서버에서 찾을 수 없습니다.", "", "SERVER ALERT"));
                         }
                     }
                 }
             }
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println(sock + ": 에러 (" + ex + ")");
+            System.out.println(sock + ": 연결 끊김 (" + ex + ")");
         } catch (Exception ex) {
-            System.out.println(sock + ": 에러 (" + ex + ")");
+            System.out.println(sock + ": 연결 끊김 (" + ex + ")");
         } finally {
             try {
                 if (sock != null) { //클라이언트가 접속을 종료했을때 소켓을 지우는 부분
-                    ECHO_CONNECT(temp_USER.ID_, false, toClient_Obj);
-                    Particiants.remove(temp_USER.ID_);
-                    remove(Client_DATA.Client_sock);
+                    if (Client_DATA.login_NOW){
+                        ChatServer.Particiants.remove(temp_USER.ID_);
+                        remove(ChatServer.Client_DATA.Client_sock);
+                        ECHO_CONNECT(temp_USER.ID_, false, toClient_Obj);
+                    }
                     sock.close();
 //                    remove(sock);
                 }

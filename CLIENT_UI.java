@@ -9,6 +9,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class CLIENT_UI extends Application {
 
     private double xOffset = 0;
@@ -18,6 +20,7 @@ public class CLIENT_UI extends Application {
     public void start(Stage primaryStage) throws Exception {
         AnchorPane root;
 
+//        root = (AnchorPane) FXMLLoader.load(getClass().getResource("login_page.fxml"));
         root = (AnchorPane) FXMLLoader.load(getClass().getResource("CHAT_UI.fxml"));
         Scene scene = new Scene(root, 550, 950);
         scene.getStylesheets().add(getClass().getResource("global_style.css").toExternalForm());
@@ -30,10 +33,10 @@ public class CLIENT_UI extends Application {
             public void handle(MouseEvent event) {
                 xOffset = event.getSceneX();
                 yOffset = event.getSceneY();
-                if (480 > xOffset && xOffset > 410 && 45 > yOffset){
+                if (480 > xOffset && xOffset > 410 && 45 > yOffset) {
                     event.consume();
                     primaryStage.setIconified(true);
-                } else if (550 > xOffset && xOffset > 480 && 45 > yOffset){
+                } else if (550 > xOffset && xOffset > 480 && 45 > yOffset) {
                     event.consume();
                     primaryStage.close();
                 }
