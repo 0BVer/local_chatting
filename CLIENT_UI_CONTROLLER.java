@@ -18,6 +18,7 @@ import javafx.scene.text.TextAlignment;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,10 @@ import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 public class CLIENT_UI_CONTROLLER implements Initializable {
+    public Button SILENT_BT;
+    public Button SAVE_BT;
+    public Pane MENU_CLOSE_BT;
+    public Pane MENU_BT;
     public Button REG_BT;
     public Button LOGIN_BT;
     public Text WARNING_MSG;
@@ -59,6 +64,8 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
         try {
 //            sock = new Socket("creater.iptime.org", 58088);
             sock = new Socket("localhost", 8888);
@@ -81,8 +88,8 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         temp_COMMAND = (command) temp_Object;
                         if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
                             if (temp_COMMAND.state) {
-                                synchronized (USER_ID) {
-                                    this.USER_ID = temp_COMMAND.message;
+                                synchronized (USER_ID){
+                                    USER_ID = temp_COMMAND.message;
                                 }
                                 LOGIN_NOW = true;
                                 Platform.runLater(() -> {
@@ -103,7 +110,9 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         }
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                         temp_CHAT = (chat_) temp_Object;
-                        CHAT_LIST.addFirst(temp_CHAT);
+                        synchronized (CHAT_LIST){
+                            CHAT_LIST.addFirst(temp_CHAT);
+                        }
                         if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
                             Platform.runLater(() -> create_CHAT_BOX_(0, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
 //                        else if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
@@ -112,19 +121,27 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                             Platform.runLater(() -> create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                     } else if (temp_Object instanceof login_users) {
                         temp_LOGIN_USERS = (login_users) temp_Object;
+                        String alert_message = "";
                         if (Participant.isEmpty()){
                             Participant = temp_LOGIN_USERS.users_ID_;
-                            Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님 채팅에 오신것을 환영합니다."));
+                            alert_message = temp_LOGIN_USERS.ID_ + "님 채팅에 오신것을 환영합니다.";
                         } else {
                             if (temp_LOGIN_USERS.state) {
                                 Participant.add(temp_LOGIN_USERS.ID_);
-                                Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님이 참가했습니다."));
+                                alert_message = temp_LOGIN_USERS.ID_ + "님이 참가했습니다.";
                             }else {
                                 Participant.remove(temp_LOGIN_USERS.ID_);
-                                Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님이 퇴장했습니다."));
+                                alert_message = temp_LOGIN_USERS.ID_ + "님이 퇴장했습니다.";
                             }
                         }
-                        Platform.runLater(() -> PARTY_MSG.setText(participant_toString(Participant)));
+                        String finalAlert_message = alert_message;
+                        Platform.runLater(() -> {
+                            create_CHAT_BOX_(0, "SEVER ALERT", finalAlert_message);
+                            PARTY_MSG.setText(participant_toString(Participant));
+                            synchronized (CHAT_LIST){
+                                CHAT_LIST.addFirst(new chat_("SERVER ALERT", finalAlert_message, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
+                            }
+                        });
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
@@ -208,8 +225,12 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         String time_;
         if (TXT_CHAT.getText().length() > 0) {
             time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
-            toServer_Obj.writeObject(new chat_(USER_ID, TXT_CHAT.getText(), time_));
+            chat_ temp = new chat_(USER_ID, TXT_CHAT.getText(), time_);
+            toServer_Obj.writeObject(temp);
             toServer_Obj.flush();
+            synchronized (CHAT_LIST){
+                CHAT_LIST.addFirst(temp);
+            }
             Platform.runLater(() -> {
                 create_CHAT_BOX_(1, time_, TXT_CHAT.getText());
                 TXT_CHAT.setText("");
@@ -257,11 +278,36 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         CHAT_BOX.setPrefHeight(CHAT_BOX.getPrefHeight() + OUT_PANE.getPrefHeight());
     }
 
-    public void SAVE_CHAT(ActionEvent actionEvent) {
-
+    public void SAVE_CHAT(ActionEvent actionEvent) throws IOException {
+        String chat_log = "";
+        synchronized (CHAT_LIST){
+            for (chat_ temp : CHAT_LIST){
+                chat_log = temp.toString() + '\n' + chat_log;
+            }
+            String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            chat_log = String.format("---%s님의 %s 채팅 기록---\n", USER_ID, today) + chat_log;
+            FileOutputStream txt_saver = new FileOutputStream(String.format("chatlog_%s.txt", today));
+            txt_saver.write(chat_log.getBytes(StandardCharsets.UTF_8));
+            txt_saver.close();
+        }
     }
 
     public void SILENT_MODE(ActionEvent actionEvent) {
 
     }
+
+    public void MENU_OPEN(ActionEvent actionEvent) {
+        MENU_CLOSE_BT.setVisible(true);
+        MENU_BT.setVisible(false);
+        SILENT_BT.setVisible(true);
+        SAVE_BT.setVisible(true);
+    }
+
+    public void MENU_CLOSE(ActionEvent actionEvent) {
+        MENU_BT.setVisible(true);
+        MENU_CLOSE_BT.setVisible(false);
+        SILENT_BT.setVisible(false);
+        SAVE_BT.setVisible(false);
+    }
+
 }

@@ -82,7 +82,7 @@
                      <Font size="14.0" />
                   </font>
                </Text>
-               <Button layoutX="350.0" layoutY="7.0" mnemonicParsing="false" onAction="#SAVE_CHAT" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="저장하기" textFill="#303030" visible="false" />
+               <Button fx:id="SAVE_BT" layoutX="350.0" layoutY="7.0" mnemonicParsing="false" onAction="#SAVE_CHAT" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="저장하기" textFill="#303030" visible="false" />
                <Button fx:id="SILENT_BT" layoutX="250.0" layoutY="7.0" mnemonicParsing="false" onAction="#SILENT_MODE" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="귓속말" textFill="#303030" visible="false" />
             </children>
          </Pane>
@@ -110,6 +110,9 @@
          </Pane>
          <Pane fx:id="MENU_CLOSE_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;" visible="false">
             <children>
+                <Button onAction="#MENU_CLOSE" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343; -fx-border-radius: 0%">
+
+                </Button>
                <Line endX="33.0" endY="29.0" startX="17.0" startY="17.0" stroke="WHITE" />
                <Line endX="33.0" endY="17.0" startX="17.0" startY="29.0" stroke="WHITE" />
             </children>
@@ -119,6 +122,9 @@
          </Pane>
          <Pane fx:id="MENU_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;">
             <children>
+                <Button onAction="#MENU_OPEN" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343; -fx-border-radius: 0%">
+
+                </Button>
                <Line endX="33.0" endY="17.0" startX="17.0" startY="17.0" stroke="WHITE" />
                <Line endX="33.0" endY="23.0" startX="17.0" startY="23.0" stroke="WHITE" />
                <Line endX="33.0" endY="29.0" startX="17.0" startY="29.0" stroke="WHITE" />
