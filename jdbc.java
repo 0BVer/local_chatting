@@ -2,13 +2,6 @@ package chat;
 
 import java.sql.*;
 
-class Table {
-    String name_;
-    Table(String name_){
-        this.name_ = name_;
-    }
-}
-
 public class jdbc {
     private Connection con;
     private PreparedStatement state;
@@ -42,9 +35,6 @@ public class jdbc {
 
             // 4) 연결이 되었다는 걸 표시
             System.out.println("DBMS와 연결되었음!");
-
-            Table user = new Table("user");
-            Table chat = new Table("chat");
 
             result.close();
             state.close();
@@ -99,6 +89,12 @@ public class jdbc {
         state.executeUpdate(); //Update, Insert, Delete
     }
 
+    public void Insert_chat(String ID_, String Chat_, String Date_, String SILENT_) throws SQLException {
+        sql = String.format("INSERT into chat values('%s', '%s', '%s', '%s');", ID_, Chat_, Date_, SILENT_);
+        state = con.prepareStatement(sql);
+        state.executeUpdate(); //Update, Insert, Delete
+    }
+
     public void Delete_chat(String ID_, String Chat_) throws SQLException {
         sql = String.format("DELETE from chat where username='%s' and text_log='%s';", ID_, Chat_);
         state = con.prepareStatement(sql);
@@ -111,26 +107,29 @@ public class jdbc {
         state.executeUpdate(); //Update, Insert, Delete
     }
 
-    public void Select_All(Table table_) throws SQLException {
-        state = con.prepareStatement(String.format("SELECT * from %s", table_.name_));
+    public String Select_All(String table_) throws SQLException {
+        state = con.prepareStatement(String.format("SELECT * from %s", table_));
         result = state.executeQuery(); //Select
-
+        String temp = "";
         System.out.println("검색 결과");
-        if (table_.name_ == "user"){
+        if (table_.compareTo("user") == 0){
             while (result.next()){
                 String id = result.getString("username");
                 String pw = result.getString("password");
                 String create_time = result.getString("create_time");
-                System.out.println("ID : " + id + " | PW : " + pw + " | 가입 날짜 : " + create_time);
+                temp += "ID : " + id + " | PW : " + pw + " | 가입 날짜 : " + create_time + "\n";
+//                System.out.println("ID : " + id + " | PW : " + pw + " | 가입 날짜 : " + create_time);
             }
-        } else if (table_.name_ == "chat"){
+        } else if (table_.compareTo("chat") == 0){
             while (result.next()){
                 String id = result.getString("username");
                 String chat_log = result.getString("text_log");
                 String create_time = result.getString("create_time");
-                System.out.println(id + " | " + create_time + " \n " + chat_log);
+                temp += id + " | " + create_time + " | " + chat_log + "\n";
+//                System.out.println(id + " | " + create_time + " \n " + chat_log);
             }
         }
+        return temp;
     }
 
     // 들어온 ID 와 비밀번호가 일치하는지 체크

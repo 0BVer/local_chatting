@@ -120,15 +120,19 @@ public class ChatServer extends Thread {
                     chat_ temp_CHAT = (chat_) temp_Object;
                     System.out.print(sock);
                     System.out.println(temp_CHAT);
-                    db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_);
 
                     if (temp_CHAT.SILENT.compareTo("") == 0) {
+                        db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_);
                         for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                             if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                                 d.toClient_Obj.writeObject(temp_CHAT);
                                 d.toClient_Obj.flush();
                             }
                         }
+                    } else if (temp_CHAT.SILENT.compareTo("/save_all_chat") == 0) {
+                        Client_DATA.toClient_Obj.writeObject(new command(5, true, db.Select_All("chat")));
+                    }else if (temp_CHAT.SILENT.compareTo("/save_all_user") == 0){
+                        Client_DATA.toClient_Obj.writeObject(new command(6, true, db.Select_All("user")));
                     } else {//귓속말 상대 배열 반복
                         boolean isntThere = true;
                         for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
@@ -141,6 +145,8 @@ public class ChatServer extends Thread {
                         }
                         if (isntThere)
                             Client_DATA.toClient_Obj.writeObject(new chat_("SERVER ALERT", "상대방을 서버에서 찾을 수 없습니다.", "", Client_DATA.USER_ID));
+                        else
+                            db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
                     }
                 }
             }
@@ -175,12 +181,6 @@ public class ChatServer extends Thread {
             myServer.start();
         }
     }
-
-    void check_DB() throws SQLException {
-        Table table = new Table("user");
-        db.Select_All(table);
-    }
-
 
     // 새로운 계정 만들기
     String set_User(String ID_, byte[] Password) throws Exception {

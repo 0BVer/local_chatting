@@ -100,6 +100,10 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                             } else {
                                 Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
                             }
+                        } else if (temp_COMMAND.command_type == 5){
+                            SAVE_ALL_("chat", temp_COMMAND.message);
+                        } else if (temp_COMMAND.command_type == 6){
+                            SAVE_ALL_("user", temp_COMMAND.message);
                         }
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                         temp_CHAT = (chat_) temp_Object;
@@ -308,6 +312,12 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
             txt_saver.write(chat_log.getBytes(StandardCharsets.UTF_8));
             txt_saver.close();
         }
+    }
+
+    public void SAVE_ALL_(String table, String all) throws IOException {
+        FileOutputStream txt_saver = new FileOutputStream(String.format("log_%s.txt", table));
+        txt_saver.write(all.getBytes(StandardCharsets.UTF_8));
+        txt_saver.close();
     }
 
     public void SILENT_MODE(ActionEvent actionEvent) {
