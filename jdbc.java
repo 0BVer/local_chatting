@@ -82,7 +82,6 @@ public class jdbc {
         state.executeUpdate(); //Update, Insert, Delete
     }
 
-
     public void Insert_chat(String ID_, String Chat_, String Date_) throws SQLException {
         sql = String.format("INSERT into chat values('%s', '%s', '%s');", ID_, Chat_, Date_);
         state = con.prepareStatement(sql);

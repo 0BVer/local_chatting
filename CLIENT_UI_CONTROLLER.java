@@ -24,21 +24,26 @@ import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 public class CLIENT_UI_CONTROLLER implements Initializable {
-    public Text SILENT_info;
-    public Button SILENT_BT;
-    public Button SAVE_BT;
-    public Pane MENU_CLOSE_BT;
-    public Pane MENU_BT;
-    public Button REG_BT;
-    public Button LOGIN_BT;
-    public Text WARNING_MSG;
-    public Pane CHAT_PANE;
-    public Pane LOGIN_PANE;
-    public TextArea TXT_CHAT;
-    public VBox CHAT_BOX;
-    public ScrollPane SCROLL_PANE;
+
     public Text TITLE_MSG;
     public Text PARTY_MSG;
+    public Text WARNING_MSG;
+    public Text SILENT_info;
+
+    public ScrollPane SCROLL_PANE;
+    public VBox CHAT_BOX;
+    public TextArea TXT_CHAT;
+
+    public Pane LOGIN_PANE;
+    public Pane CHAT_PANE;
+    public Pane MENU_CLOSE_BT;
+    public Pane MENU_BT;
+
+    public Button LOGIN_BT;
+    public Button REG_BT;
+    public Button SILENT_BT;
+    public Button SAVE_BT;
+
     @FXML
     private TextField TXT_ID;
     @FXML
@@ -47,6 +52,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     private TextField TXT_PW_CF;
     @FXML
     private TextField SILENT_ID;
+
     private boolean LOGIN_NOW = false;
     private boolean register_mode = false;
 

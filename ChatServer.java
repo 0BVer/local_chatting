@@ -27,7 +27,7 @@ public class ChatServer extends Thread {
     private static final ArrayList<Server_DATA> Connected_Clients = new ArrayList<>(10); //클라이언트 소켓을 담는 배열 (비공개)
 
     private static final int SALT_SIZE = 16;
-    private static jdbc db = new jdbc();
+    private static final jdbc db = new jdbc();
 
     public ChatServer(Socket sock) {
         this.sock = sock;
@@ -66,12 +66,9 @@ public class ChatServer extends Thread {
     public void run() {
         //쓰레드가 할 일
         ObjectInputStream fromClient_Obj;
-        ObjectOutputStream toClient_Obj;
 
         user_ temp_USER;
-        command temp_COMMAND;
         String temp_string = "";
-        String sock_ID = "";
 
         try {
             System.out.println(sock + ": 연결됨");
@@ -193,8 +190,7 @@ public class ChatServer extends Thread {
         String temp_salt = db.get_SALT(ID_); // 해당 ID의 SALT 값을 찾는다
         String temp_pass = Hashing(password_, temp_salt); // 얻어온 Salt 와 password 를 조합해본다.
 
-        if (db.check(ID_, temp_pass)) return true; // db 에 저장된 아이디와 비밀번호를 대조한
-        else return false;
+        return db.check(ID_, temp_pass); // db 에 저장된 아이디와 비밀번호를 대조한
     }
 
     // 비밀번호 해싱
