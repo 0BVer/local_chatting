@@ -167,11 +167,10 @@ public class ChatServer extends Thread {
         System.out.println(serverSock + ": 서버 소켓 생성");
 
 //        jdbc dele = new jdbc(); //데이터베이스 청소
-//        dele.Delete_ALL_user();
 //        dele.Delete_ALL_chat();
+//        dele.Delete_ALL_user();
 
         while (true) { //클라이언트의 접속을 대기하는 부분
-
             ChatServer myServer = new ChatServer(serverSock.accept());
             myServer.start();
         }

@@ -12,7 +12,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import javax.naming.Binding;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -65,7 +64,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//        SCROLL_PANE.vvalueProperty().bind(CHAT_BOX.heightProperty());
+        SCROLL_PANE.vvalueProperty().bind(CHAT_BOX.heightProperty());
         try {
 //            sock = new Socket("creater.iptime.org", 58088);
             sock = new Socket("localhost", 8888);
@@ -75,13 +74,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
             e.printStackTrace();
         }
         Thread From_Server = new Thread(() -> {
-//            InputStream fromServer = null;
-//            ObjectInputStream fromServer_OBJ = null;
             try {
-//                fromServer = sock.getInputStream();
-//                fromServer_OBJ = new ObjectInputStream(fromServer);
-
-
                 while (true) { //수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
                     Object temp_Object = (Object) fromServer_OBJ.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                     if (temp_Object instanceof command) { //전달받은 객체가 명령어 타입일때
@@ -143,7 +136,10 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
-                Platform.runLater(() -> WARNING_MSG.setText("서버를 찾을 수 없습니다. 다시 접속해 주세요"));
+                Platform.runLater(() -> {
+                    WARNING_MSG.setText("서버를 찾을 수 없습니다. 다시 접속해 주세요");
+                    TITLE_MSG.setText("CONNECTION LOST");
+                });
                 System.out.println("연결 종료 (" + ex + ")");
             } finally {
                 try {
@@ -224,6 +220,8 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         if (TXT_CHAT.getText().length() > 0) {
             time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
             chat_ temp = null;
+
+            //귓속말인지 확인하는 기능
             if (SILENT_ID.getText().compareTo("") == 0) {
                 temp = new chat_(USER_ID, TXT_CHAT.getText(), time_);
                 create_CHAT_BOX_(1, time_, TXT_CHAT.getText(), false);
@@ -233,13 +231,17 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                 create_CHAT_BOX_(1, time_, TXT_CHAT.getText(), true);
                 TXT_CHAT.setText("");
             }
+
             toServer_Obj.writeObject(temp);
             toServer_Obj.flush();
             synchronized (CHAT_LIST) {
                 CHAT_LIST.addFirst(temp);
             }
 
-
+            //채팅을 보냈을때 메뉴가 열려있으면 닫는 기능
+            if (MENU_CLOSE_BT.isVisible()){
+                MENU_CLOSE(new ActionEvent());
+            }
         }
     }
 
