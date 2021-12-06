@@ -14,155 +14,202 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="950.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.CLIENT_UI_CONTROLLER">
+<AnchorPane prefHeight="950.0" prefWidth="550.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="chat.CLIENT_UI_CONTROLLER">
     <Pane fx:id="LOGIN_PANE" layoutY="45.0" prefHeight="905.0" prefWidth="550.0">
         <children>
-            <Text fill="#2f2f2f" layoutX="155.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="환영합니다" textAlignment="CENTER">
+            <Text fill="#2f2f2f" layoutX="155.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="환영합니다"
+                  textAlignment="CENTER">
                 <font>
-                    <Font size="48.0" />
+                    <Font size="48.0"/>
                 </font>
             </Text>
-            <Text fx:id="WARNING_MSG" fill="#E76666" layoutX="101.0" layoutY="605.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" visible="true" wrappingWidth="340.0">
+            <Text fx:id="WARNING_MSG" fill="#E76666" layoutX="101.0" layoutY="605.0" strokeType="OUTSIDE"
+                  strokeWidth="0.0" text="" textAlignment="CENTER" visible="true" wrappingWidth="340.0">
                 <font>
-                    <Font size="14.0" />
+                    <Font size="14.0"/>
                 </font>
             </Text>
-            <Pane layoutX="85.0" layoutY="295.0" prefHeight="70.0" prefWidth="380.0" style="-fx-background-color: #F3F3F3;">
+            <Pane layoutX="85.0" layoutY="295.0" prefHeight="70.0" prefWidth="380.0"
+                  style="-fx-background-color: #F3F3F3;">
                 <children>
-                    <TextField fx:id="TXT_ID" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="340.0" promptText="ID" style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
+                    <TextField fx:id="TXT_ID" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT"
+                               prefHeight="50.0" prefWidth="340.0" promptText="ID"
+                               style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
                         <font>
-                            <Font size="18.0" />
+                            <Font size="18.0"/>
                         </font>
                     </TextField>
                 </children>
             </Pane>
-            <Pane layoutX="85.0" layoutY="395.0" prefHeight="70.0" prefWidth="380.0" style="-fx-background-color: #F3F3F3;">
+            <Pane layoutX="85.0" layoutY="395.0" prefHeight="70.0" prefWidth="380.0"
+                  style="-fx-background-color: #F3F3F3;">
                 <children>
-                    <PasswordField fx:id="TXT_PW" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="340.0" promptText="PW" style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
+                    <PasswordField fx:id="TXT_PW" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT"
+                                   prefHeight="50.0" prefWidth="340.0" promptText="PW"
+                                   style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
                         <font>
-                            <Font size="18.0" />
+                            <Font size="18.0"/>
                         </font>
                     </PasswordField>
                 </children>
             </Pane>
-            <Pane layoutX="85.0" layoutY="495.0" prefHeight="70.0" prefWidth="380.0" style="-fx-background-color: #F3F3F3;">
+            <Pane layoutX="85.0" layoutY="495.0" prefHeight="70.0" prefWidth="380.0"
+                  style="-fx-background-color: #F3F3F3;">
                 <children>
-                    <PasswordField fx:id="TXT_PW_CF" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="340.0" promptText="PW Confirm" style="-fx-alignment: center; -fx-background-color: #D4D4D4;" visible="false">
+                    <PasswordField fx:id="TXT_PW_CF" layoutX="20.0" layoutY="10.0" nodeOrientation="LEFT_TO_RIGHT"
+                                   prefHeight="50.0" prefWidth="340.0" promptText="PW Confirm"
+                                   style="-fx-alignment: center; -fx-background-color: #D4D4D4;" visible="false">
                         <font>
-                            <Font size="18.0" />
+                            <Font size="18.0"/>
                         </font>
                     </PasswordField>
                 </children>
             </Pane>
-            <Button fx:id="LOGIN_BT" layoutX="115.0" layoutY="645.0" mnemonicParsing="false" onAction="#LOGIN_IN" prefHeight="40.0" prefWidth="320.0" style="-fx-all: none; -fx-background-color: #434343; -fx-background-radius: 0%;" text="로그인하기" textFill="#cfcfcf">
+            <Button fx:id="LOGIN_BT" layoutX="115.0" layoutY="645.0" mnemonicParsing="false" onAction="#LOGIN_IN"
+                    prefHeight="40.0" prefWidth="320.0"
+                    style="-fx-all: none; -fx-background-color: #434343; -fx-background-radius: 0%;" text="로그인하기"
+                    textFill="#cfcfcf">
                 <font>
-                    <Font size="18.0" />
+                    <Font size="18.0"/>
                 </font>
                 <cursor>
-                    <Cursor fx:constant="HAND" />
+                    <Cursor fx:constant="HAND"/>
                 </cursor>
             </Button>
 
-            <Button fx:id="REG_BT" layoutX="115.0" layoutY="715.0" mnemonicParsing="false" onAction="#REGISTER_IN" prefHeight="40.0" prefWidth="320.0" style="-fx-all: none; -fx-background-color: #434343; -fx-background-radius: 0%;" text="처음이신가요?" textFill="#cfcfcf">
+            <Button fx:id="REG_BT" layoutX="115.0" layoutY="715.0" mnemonicParsing="false" onAction="#REGISTER_IN"
+                    prefHeight="40.0" prefWidth="320.0"
+                    style="-fx-all: none; -fx-background-color: #434343; -fx-background-radius: 0%;" text="처음이신가요?"
+                    textFill="#cfcfcf">
                 <font>
-                    <Font size="18.0" />
+                    <Font size="18.0"/>
                 </font>
                 <cursor>
-                    <Cursor fx:constant="HAND" />
+                    <Cursor fx:constant="HAND"/>
                 </cursor>
             </Button>
         </children>
     </Pane>
-    <Pane fx:id="CHAT_PANE" layoutY="45.0" prefHeight="905.0" prefWidth="550.0" style="-fx-background-color: #2F2F2F;" visible="false">
+    <Pane fx:id="CHAT_PANE" layoutY="45.0" prefHeight="905.0" prefWidth="550.0" style="-fx-background-color: #2F2F2F;"
+          visible="false">
         <children>
-         <Pane fx:id="CHAT_BG" layoutX="20.0" layoutY="15.0" prefHeight="45.0" prefWidth="440.0" style="-fx-background-color: #434343;">
-            <children>
-               <Text fx:id="PARTY_MSG" fill="WHITE" layoutX="14.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="참가자">
-                  <font>
-                     <Font size="14.0" />
-                  </font>
-               </Text>
-               <Button fx:id="SAVE_BT" layoutX="350.0" layoutY="7.0" mnemonicParsing="false" onAction="#SAVE_CHAT" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="저장하기" textFill="#303030" visible="false" />
-               <Button fx:id="SILENT_BT" layoutX="250.0" layoutY="7.0" mnemonicParsing="false" onAction="#SILENT_MODE" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="귓속말" textFill="#303030" visible="false" />
-            </children>
-         </Pane>
-         <ScrollPane fx:id="SCROLL_PANE" fitToWidth="true" layoutX="20.0" layoutY="80.0" prefHeight="635.0" prefWidth="515.0" style="-fx-background-color: #2f2f2f; -fx-background: #2f2f2f;">
-            <content>
-               <VBox fx:id="CHAT_BOX" prefHeight="1.0" prefWidth="510.0" />
-            </content>
-         </ScrollPane>
-         <Pane layoutY="735.0" prefHeight="170.0" prefWidth="550.0" style="-fx-background-color: #FFFFFF;">
-            <children>
-               <TextArea fx:id="TXT_CHAT" layoutX="20.0" layoutY="20.0" prefHeight="100.0" prefWidth="425.0" style="-fx-background-color: #F5F5F5;">
-                  <font>
-                     <Font size="14.0" />
-                  </font>
-               </TextArea>
-               <Button layoutX="465.0" layoutY="20.0" mnemonicParsing="false" onAction="#SEND_CHAT" prefHeight="45.0" prefWidth="65.0" style="-fx-background-color: #434343;" text="전송" textAlignment="CENTER" textFill="WHITE">
-                  <font>
-                     <Font size="18.0" />
-                  </font>
-                  <cursor>
-                     <Cursor fx:constant="HAND" />
-                  </cursor>
-               </Button>
-            </children>
-         </Pane>
-         <Pane fx:id="MENU_CLOSE_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;" visible="false">
-            <children>
-                <Button onAction="#MENU_CLOSE" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343; -fx-border-radius: 0%">
+            <Pane fx:id="CHAT_BG" layoutX="20.0" layoutY="15.0" prefHeight="45.0" prefWidth="440.0"
+                  style="-fx-background-color: #434343;">
+                <children>
+                    <Text fx:id="PARTY_MSG" fill="WHITE" layoutX="14.0" layoutY="28.0" strokeType="OUTSIDE"
+                          strokeWidth="0.0" text="참가자">
+                        <font>
+                            <Font size="14.0"/>
+                        </font>
+                    </Text>
+                    <Button fx:id="SAVE_BT" layoutX="350.0" layoutY="7.0" mnemonicParsing="false" onAction="#SAVE_CHAT"
+                            prefHeight="30.0" prefWidth="80.0"
+                            style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="저장하기"
+                            textFill="#303030" visible="false"/>
+                    <Button fx:id="SILENT_BT" layoutX="250.0" layoutY="7.0" mnemonicParsing="false"
+                            onAction="#SILENT_MODE" prefHeight="30.0" prefWidth="80.0"
+                            style="-fx-background-color: #C3C3C3; -fx-background-radius: 0%;" text="귓속말"
+                            textFill="#303030" visible="false"/>
+                </children>
+            </Pane>
+            <ScrollPane fx:id="SCROLL_PANE" fitToWidth="true" layoutX="20.0" layoutY="80.0" prefHeight="635.0"
+                        prefWidth="515.0" style="-fx-background-color: #2f2f2f; -fx-background: #2f2f2f;">
+                <content>
+                    <VBox fx:id="CHAT_BOX" prefHeight="1.0" prefWidth="510.0"/>
+                </content>
+            </ScrollPane>
+            <Pane layoutY="735.0" prefHeight="170.0" prefWidth="550.0" style="-fx-background-color: #FFFFFF;">
+                <children>
+                    <TextArea fx:id="TXT_CHAT" layoutX="20.0" layoutY="20.0" prefHeight="100.0" prefWidth="425.0"
+                              style="-fx-background-color: #F5F5F5;">
+                        <font>
+                            <Font size="14.0"/>
+                        </font>
+                    </TextArea>
+                    <Button layoutX="465.0" layoutY="20.0" mnemonicParsing="false" onAction="#SEND_CHAT"
+                            prefHeight="45.0" prefWidth="65.0" style="-fx-background-color: #434343;" text="전송"
+                            textAlignment="CENTER" textFill="WHITE">
+                        <font>
+                            <Font size="18.0"/>
+                        </font>
+                        <cursor>
+                            <Cursor fx:constant="HAND"/>
+                        </cursor>
+                    </Button>
+                </children>
+            </Pane>
+            <Pane fx:id="MENU_CLOSE_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0"
+                  style="-fx-background-color: #434343;" visible="false">
+                <children>
+                    <Line endX="33.0" endY="29.0" startX="17.0" startY="17.0" stroke="WHITE"/>
+                    <Line endX="33.0" endY="17.0" startX="17.0" startY="29.0" stroke="WHITE"/>
+                    <Button onAction="#MENU_CLOSE" prefHeight="45.0" prefWidth="50.0"
+                            style="-fx-background-color: transparent; -fx-border-radius: 0%">
 
-                </Button>
-               <Line endX="33.0" endY="29.0" startX="17.0" startY="17.0" stroke="WHITE" />
-               <Line endX="33.0" endY="17.0" startX="17.0" startY="29.0" stroke="WHITE" />
-            </children>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Pane>
-         <Pane fx:id="MENU_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343;">
-            <children>
-                <Button onAction="#MENU_OPEN" prefHeight="45.0" prefWidth="50.0" style="-fx-background-color: #434343; -fx-border-radius: 0%">
+                    </Button>
+                </children>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Pane>
+            <Pane fx:id="MENU_BT" layoutX="480.0" layoutY="15.0" prefHeight="45.0" prefWidth="50.0"
+                  style="-fx-background-color: #434343;">
+                <children>
+                    <Line endX="33.0" endY="17.0" startX="17.0" startY="17.0" stroke="WHITE"/>
+                    <Line endX="33.0" endY="23.0" startX="17.0" startY="23.0" stroke="WHITE"/>
+                    <Line endX="33.0" endY="29.0" startX="17.0" startY="29.0" stroke="WHITE"/>
+                    <Button onAction="#MENU_OPEN" prefHeight="45.0" prefWidth="50.0"
+                            style="-fx-background-color: transparent; -fx-border-radius: 0%">
 
-                </Button>
-               <Line endX="33.0" endY="17.0" startX="17.0" startY="17.0" stroke="WHITE" />
-               <Line endX="33.0" endY="23.0" startX="17.0" startY="23.0" stroke="WHITE" />
-               <Line endX="33.0" endY="29.0" startX="17.0" startY="29.0" stroke="WHITE" />
-            </children>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </Pane>
+                    </Button>
+                </children>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Pane>
+            <TextField fx:id="SILENT_ID" layoutX="100.0" layoutY="360.0" nodeOrientation="LEFT_TO_RIGHT"
+                       prefHeight="50.0" prefWidth="340.0" promptText="SILENT to" visible="false"
+                       style="-fx-alignment: center; -fx-all: none; -fx-background-color: #D4D4D4;">
+                <font>
+                    <Font size="18.0"/>
+                </font>
+            </TextField>
+            <Text fx:id="SILENT_info" layoutX="102.0" layoutY="430.0" text="메뉴를 닫으면 해당 상대에게 귓속말이 전송됩니다." visible="false"
+                  fill="white">
+                <Font size="14"/>
+            </Text>
         </children>
     </Pane>
-      <HBox alignment="TOP_RIGHT" prefHeight="45.0" prefWidth="550.0">
-          <children>
-              <Pane prefHeight="45.0" prefWidth="410.0" style="-fx-background-color: #2f2f2f;">
-                  <children>
-                      <Text fx:id="TITLE_MSG" fill="WHITE" layoutX="20.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Global">
-                          <font>
-                              <Font size="18.0" />
-                          </font>
-                      </Text>
-                  </children>
-              </Pane>
-              <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: c4c4c4;">
-                  <children>
-                      <Line endX="40.0" endY="23.0" startX="30.0" startY="23.0" stroke="#303030" />
-                  </children>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-              </Pane>
-              <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: E76666;">
-                  <children>
-                      <Line endX="40.0" endY="30.0" startX="30.0" startY="15.0" stroke="#303030" />
-                      <Line endX="40.0" endY="15.0" startX="30.0" startY="30.0" stroke="#303030" />
-                  </children>
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-              </Pane>
-          </children>
-      </HBox>
+    <HBox alignment="TOP_RIGHT" prefHeight="45.0" prefWidth="550.0">
+        <children>
+            <Pane prefHeight="45.0" prefWidth="410.0" style="-fx-background-color: #2f2f2f;">
+                <children>
+                    <Text fx:id="TITLE_MSG" fill="WHITE" layoutX="20.0" layoutY="30.0" strokeType="OUTSIDE"
+                          strokeWidth="0.0" text="Global">
+                        <font>
+                            <Font size="18.0"/>
+                        </font>
+                    </Text>
+                </children>
+            </Pane>
+            <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: c4c4c4;">
+                <children>
+                    <Line endX="40.0" endY="23.0" startX="30.0" startY="23.0" stroke="#303030"/>
+                </children>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Pane>
+            <Pane prefHeight="45.0" prefWidth="70.0" style="-fx-background-color: E76666;">
+                <children>
+                    <Line endX="40.0" endY="30.0" startX="30.0" startY="15.0" stroke="#303030"/>
+                    <Line endX="40.0" endY="15.0" startX="30.0" startY="30.0" stroke="#303030"/>
+                </children>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Pane>
+        </children>
+    </HBox>
 </AnchorPane>
