@@ -98,7 +98,7 @@ class user_ implements Serializable {
 class login_users implements Serializable {
     String ID_ = "";
     boolean state;
-    ArrayList<String> users_ID_ = new ArrayList(10);
+    ArrayList<String> users_ID_;
 
     login_users(String ID_, boolean state, ArrayList users_ID_) {
         this.ID_ = ID_;

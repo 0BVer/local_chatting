@@ -24,6 +24,7 @@ class ServerHandler_v2 extends Thread {
     }
 
     public void run() {
+
         OutputStream toServer_temp = null;
         InputStream fromServer = null;
         ObjectInputStream fromServer_OBJ = null;

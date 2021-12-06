@@ -54,13 +54,9 @@ public class jdbc {
             System.out.println("DB연결 실패하거나, SQL문이 틀렸습니다.");
             System.out.print("사유 : " + e.getMessage());
         } catch (Exception e) {
-//            e.printStackTrace();
         }
     }
 
-//    public static void main(String[] args) {
-//        new jdbc();
-//    }
 
     public String Insert_user(String ID_, String PW_, String Salt_) throws SQLException {
         try {
@@ -119,7 +115,7 @@ public class jdbc {
         state = con.prepareStatement(String.format("SELECT * from %s", table_.name_));
         result = state.executeQuery(); //Select
 
-        System.out.println("검섹 결과");
+        System.out.println("검색 결과");
         if (table_.name_ == "user"){
             while (result.next()){
                 String id = result.getString("username");
@@ -144,11 +140,9 @@ public class jdbc {
         String temp = "error";
         if (result.next() == true) {
             temp = result.getString("username");
-            System.out.println(temp.length());
             if (temp.equals(ID_))
                 return true;
         }
-//        System.out.println(temp.getBytes() + "    " + ID_.getBytes());
         return false;
     }
 
@@ -162,72 +156,3 @@ public class jdbc {
             return "";
     }
 }
-
-
-/*
-class User {
-
-    private static final int SALT_SIZE = 16;
-    private static jdbc db = new jdbc();
-
-
-    // 새로운 계정 만들기
-    public void set_User(String ID_, byte[] Password) throws Exception {
-        String SALT = getSALT();
-        System.out.println("SALT");
-        System.out.println(SALT);
-        db.Insert_Delete_user(1, ID_, Hashing(Password, SALT), SALT);
-    }
-
-
-    // 유저 정보와 대조한 뒤 로그인 하기
-    public void get_User(String ID_, byte[] password_) throws Exception {
-        String temp_salt = db.get_SALT(ID_);                    // 해당 ID의 SALT 값을 찾는다
-        String temp_pass = Hashing(password_, temp_salt);    // 얻어온 Salt 와 password 를 조합해본다.
-
-        if (db.check(ID_, temp_pass)) {                        // db 에 저장된 아이디와 비밀번호를 대조한다
-            System.out.println("로그인 성공");
-        } else {
-            System.out.println("로그인 실패");
-        }
-    }
-
-
-    // 비밀번호 해싱
-    private String Hashing(byte[] password_, String Salt) throws Exception {
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");    // SHA-256 해시함수를 사용
-
-        // key-stretching
-        for (int i = 0; i < 10000; i++) {
-            String temp = Byte_to_String(password_) + Salt;    // 패스워드와 Salt 를 합쳐 새로운 문자열 생성
-            md.update(temp.getBytes());                        // temp 의 문자열을 해싱하여 md 에 저장해둔다
-            password_ = md.digest();                            // md 객체의 다이제스트를 얻어 password 를 갱신한다
-        }
-        return Byte_to_String(password_);
-    }
-
-
-    // SALT 값 생성
-    private String getSALT() throws Exception {
-        System.out.println("1111111111111");
-        SecureRandom rnd = new SecureRandom();
-        System.out.println("22222222       ");
-        byte[] temp = new byte[SALT_SIZE];
-        rnd.nextBytes(temp);
-
-        return Byte_to_String(temp);
-
-    }
-
-
-    // 바이트 값을 16진수로 변경해준다
-    private String Byte_to_String(byte[] temp) {
-        StringBuilder sb = new StringBuilder();
-        for (byte a : temp) {
-            sb.append(String.format("%02x", a));
-        }
-        return sb.toString();
-    }
-}
-*/

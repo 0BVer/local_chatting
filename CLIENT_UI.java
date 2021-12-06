@@ -9,8 +9,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class CLIENT_UI extends Application {
 
     private double xOffset = 0;

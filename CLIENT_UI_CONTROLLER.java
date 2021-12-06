@@ -36,17 +36,19 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     public ScrollPane SCROLL_PANE;
     public Text TITLE_MSG;
     public Text PARTY_MSG;
-
     @FXML
-    TextField TXT_ID;
+    private TextField TXT_ID;
     @FXML
     private TextField TXT_PW;
     @FXML
     private TextField TXT_PW_CF;
     private boolean LOGIN_NOW = false;
     private boolean register_mode = false;
+
     Socket sock;
     ObjectOutputStream toServer_Obj;
+    ObjectInputStream fromServer_OBJ;
+
     command temp_COMMAND;
     chat_ temp_CHAT;
     login_users temp_LOGIN_USERS;
@@ -61,15 +63,17 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
 //            sock = new Socket("creater.iptime.org", 58088);
             sock = new Socket("localhost", 8888);
             toServer_Obj = new ObjectOutputStream(sock.getOutputStream());
+            fromServer_OBJ = new ObjectInputStream(sock.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
         Thread From_Server = new Thread(() -> {
-            InputStream fromServer1 = null;
-            ObjectInputStream fromServer_OBJ = null;
+//            InputStream fromServer = null;
+//            ObjectInputStream fromServer_OBJ = null;
             try {
-                fromServer1 = sock.getInputStream();
-                fromServer_OBJ = new ObjectInputStream(fromServer1);
+//                fromServer = sock.getInputStream();
+//                fromServer_OBJ = new ObjectInputStream(fromServer);
+
 
                 while (true) { //수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
                     Object temp_Object = (Object) fromServer_OBJ.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
@@ -77,12 +81,13 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         temp_COMMAND = (command) temp_Object;
                         if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
                             if (temp_COMMAND.state) {
-                                USER_ID = TXT_ID.getText();
+                                synchronized (USER_ID) {
+                                    this.USER_ID = temp_COMMAND.message;
+                                }
                                 LOGIN_NOW = true;
                                 Platform.runLater(() -> {
                                     try {
                                         CHANGE_SCENE();
-                                        PARTY_MSG.setText(Participant.toString().substring(1, Participant.toString().length() - 1));
                                     } catch (IOException e) {
                                     }
                                 });
@@ -100,20 +105,26 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                         temp_CHAT = (chat_) temp_Object;
                         CHAT_LIST.addFirst(temp_CHAT);
                         if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
-                            Platform.runLater(() -> create_CHAT_BOX_(0, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                            Platform.runLater(() -> create_CHAT_BOX_(0, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
 //                        else if (temp_CHAT.ID_.compareTo(USER_ID) == 0)
 //                            Platform.runLater(() -> create_CHAT_BOX_(1, temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                         else
-                            Platform.runLater(() -> create_CHAT_BOX_(2, USER_ID + " - " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
+                            Platform.runLater(() -> create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_));
                     } else if (temp_Object instanceof login_users) {
                         temp_LOGIN_USERS = (login_users) temp_Object;
-                        if (temp_LOGIN_USERS.state) {
-                            Participant.add(temp_LOGIN_USERS.ID_);
-                            Platform.runLater(() -> PARTY_MSG.setText(temp_LOGIN_USERS.toString()));
+                        if (Participant.isEmpty()){
+                            Participant = temp_LOGIN_USERS.users_ID_;
+                            Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님 채팅에 오신것을 환영합니다."));
                         } else {
-                            Participant.remove(temp_LOGIN_USERS.ID_);
-                            Platform.runLater(() -> PARTY_MSG.setText(temp_LOGIN_USERS.toString()));
+                            if (temp_LOGIN_USERS.state) {
+                                Participant.add(temp_LOGIN_USERS.ID_);
+                                Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님이 참가했습니다."));
+                            }else {
+                                Participant.remove(temp_LOGIN_USERS.ID_);
+                                Platform.runLater(() -> create_CHAT_BOX_(0, "SEVER ALERT", temp_LOGIN_USERS.ID_ + "님이 퇴장했습니다."));
+                            }
                         }
+                        Platform.runLater(() -> PARTY_MSG.setText(participant_toString(Participant)));
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
@@ -121,10 +132,6 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                 System.out.println("연결 종료 (" + ex + ")");
             } finally {
                 try {
-                    if (fromServer1 != null) {
-                        fromServer1.close();
-                        fromServer_OBJ.close();
-                    }
                     if (sock != null)
                         sock.close();
                 } catch (IOException ex) {
@@ -133,6 +140,18 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         });
         From_Server.setDaemon(true);
         From_Server.start();
+    }
+
+    public String participant_toString(ArrayList<String> participant) {
+        String temp = "";
+        int count = 0;
+        for (String user : participant) {
+            if (user.length() > 0) {
+                temp += user + ", ";
+                count++;
+            }
+        }
+        return String.format("Online [%d/10] ", count) + temp.substring(0, temp.length() - 2);
     }
 
     public void CHANGE_SCENE() throws IOException {
@@ -216,17 +235,17 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         IN_PANE.setPrefHeight(37 + CHAT_FIELD.getLayoutBounds().getHeight());
         IN_PANE.setPrefWidth(425);
 
-        if (SENDER == 0) {
+        if (SENDER == 0) { //서버
             IN_PANE.setPrefWidth(500);
             IN_PANE.setStyle("-fx-background-color: #C4C4C4;");
-        } else if (SENDER == 1) {
+        } else if (SENDER == 1) { //수신
             ID_DATE_FIELD.setFill(Paint.valueOf("WHITE"));
             ID_DATE_FIELD.setTextAlignment(TextAlignment.valueOf("RIGHT"));
             CHAT_FIELD.setFill(Paint.valueOf("WHITE"));
             CHAT_FIELD.setTextAlignment(TextAlignment.valueOf("RIGHT"));
             IN_PANE.setLayoutX(75);
             IN_PANE.setStyle("-fx-background-color: #434343;");
-        } else if (SENDER == 2) {
+        } else if (SENDER == 2) { //송신
             IN_PANE.setStyle("-fx-background-color: #C4C4C4;");
         }
 
@@ -239,8 +258,10 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     }
 
     public void SAVE_CHAT(ActionEvent actionEvent) {
+
     }
 
     public void SILENT_MODE(ActionEvent actionEvent) {
+
     }
 }
