@@ -84,15 +84,6 @@ class user_ implements Serializable {
         }
         return sb.toString();
     }
-
-    @Override
-    public String toString() {
-        return "user_{" +
-                "ID_='" + ID_ + '\'' +
-                ", PW_='" + PW_ + '\'' +
-                ", login_=" + login_ +
-                '}';
-    }
 }
 
 class login_users implements Serializable {

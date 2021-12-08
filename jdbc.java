@@ -36,9 +36,9 @@ public class jdbc {
             // 4) 연결이 되었다는 걸 표시
             System.out.println("DBMS와 연결되었음!");
 
-            result.close();
-            state.close();
-            con.close();
+//            result.close();
+//            state.close();
+//            con.close();
 
         } catch (SQLException e) {
             System.out.println("DB연결 실패하거나, SQL문이 틀렸습니다.");
@@ -82,11 +82,11 @@ public class jdbc {
         state.executeUpdate(); //Update, Insert, Delete
     }
 
-    public void Insert_chat(String ID_, String Chat_, String Date_) throws SQLException {
-        sql = String.format("INSERT into chat values('%s', '%s', '%s');", ID_, Chat_, Date_);
-        state = con.prepareStatement(sql);
-        state.executeUpdate(); //Update, Insert, Delete
-    }
+//    public void Insert_chat(String ID_, String Chat_, String Date_) throws SQLException {
+//        sql = String.format("INSERT into chat values('%s', '%s', '%s');", ID_, Chat_, Date_);
+//        state = con.prepareStatement(sql);
+//        state.executeUpdate(); //Update, Insert, Delete
+//    }
 
     public void Insert_chat(String ID_, String Chat_, String Date_, String SILENT_) throws SQLException {
         sql = String.format("INSERT into chat values('%s', '%s', '%s', '%s');", ID_, Chat_, Date_, SILENT_);

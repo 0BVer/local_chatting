@@ -83,18 +83,25 @@ public class ChatServer extends Thread {
                     if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
                         if (get_User(temp_USER.ID_, temp_USER.PW_.getBytes())) {
 
-                            Client_DATA.login_NOW = true;
-                            Client_DATA.USER_ID = temp_USER.ID_;
+                            synchronized (ChatServer.Connected_Clients) {
+                                if (ChatServer.Connected_Clients.size() >= 10) {
+                                    Client_DATA.toClient_Obj.writeObject(new command(1, false, "서버의 정원이 가득 찼습니다."));
+                                    Client_DATA.toClient_Obj.flush();
+                                    System.out.println(sock + " : 수용인원 초과로 로그인 실패");
+                                    continue;
+                                }
+                                Client_DATA.login_NOW = true;
+                                Client_DATA.USER_ID = temp_USER.ID_;
+                                ChatServer.Connected_Clients.add(Client_DATA);
+                                Client_DATA.toClient_Obj.writeObject(new command(1, true, temp_USER.ID_));
+                                Client_DATA.toClient_Obj.flush();
+                            }
                             synchronized (ChatServer.Particiants) {
                                 ChatServer.Particiants.add(temp_USER.ID_);
                                 Client_DATA.toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
                                 Client_DATA.toClient_Obj.flush();
                             }
-                            synchronized (ChatServer.Connected_Clients) {
-                                ChatServer.Connected_Clients.add(Client_DATA);
-                                Client_DATA.toClient_Obj.writeObject(new command(1, true, temp_USER.ID_));
-                                Client_DATA.toClient_Obj.flush();
-                            }
+
                             ECHO_CONNECT(Client_DATA.USER_ID, true);
 
                             System.out.println(sock + " : 로그인 성공");
@@ -119,7 +126,7 @@ public class ChatServer extends Thread {
                     System.out.println(temp_CHAT);
 
                     if (temp_CHAT.SILENT.compareTo("") == 0) {
-                        db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_);
+                        db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
                         for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                             if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                                 d.toClient_Obj.writeObject(temp_CHAT);
@@ -128,7 +135,7 @@ public class ChatServer extends Thread {
                         }
                     } else if (temp_CHAT.SILENT.compareTo("/save_all_chat") == 0) {
                         Client_DATA.toClient_Obj.writeObject(new command(5, true, db.Select_All("chat")));
-                    }else if (temp_CHAT.SILENT.compareTo("/save_all_user") == 0){
+                    } else if (temp_CHAT.SILENT.compareTo("/save_all_user") == 0) {
                         Client_DATA.toClient_Obj.writeObject(new command(6, true, db.Select_All("user")));
                     } else {//귓속말 상대 배열 반복
                         boolean isntThere = true;
@@ -174,8 +181,10 @@ public class ChatServer extends Thread {
 //        dele.Delete_ALL_user();
 
         while (true) { //클라이언트의 접속을 대기하는 부분
-            ChatServer myServer = new ChatServer(serverSock.accept());
-            myServer.start();
+            if (Connected_Clients.size() < 10) {
+                ChatServer myServer = new ChatServer(serverSock.accept());
+                myServer.start();
+            }
         }
     }
 
