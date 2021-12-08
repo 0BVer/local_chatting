@@ -10,30 +10,14 @@ public class jdbc {
 
     public jdbc(){
         try {
-            // 1) MySQl JDBC 드라이버의 정보를 다루는 객체를 생성한다.
-            //    => 이 객체를 통해 MySQL DMBS에 연결할 수 있다.
             com.mysql.cj.jdbc.Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
-
-            // 2) MySQL JDBC 드라이버를 "드라이버 관리자"에 등록한다.
-            //    => 반드시 java.lang.Driver 규칙에 따라 만든 클래스여아 한다.
             DriverManager.registerDriver(mysqlDriver);
-
-            // 3) 드라이버 관리자를 통해 DBMS와 연결한다.
-            //    => 직접 MySQL 드라이버를 사용하지 않고,
-            //       이렇게 DriverManager 클래스를 통해 우회하여 DBMS와 연결한다.
-            //    => 이렇게 우회하는 이유? 특정 DBMS에 종속되지 않기 위함이다.
-            //       자바 코드를 작성할 때 특정 DBMS에서만 유효한 코드를 작성하게 되면,
-            //       그 DBMS에 종속되게 되고 유지보수가 힘들어진다.
-            //    => DriverManager의 getConnection()을 호출하여 DMBS와 연결한다.
-            //       리턴 값은 DBMS와의 연결 정보를 갖고 있는,
-            //       java.sql.Connection 규격에 따라 만든 객체이다.
 
             con = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
                     "root", /* 해당 DB를 사용할 수 있는 아이디*/
                     "1234" /* 사용자 암호 */);
 
-            // 4) 연결이 되었다는 걸 표시
             System.out.println("DBMS와 연결되었음!");
 
 //            result.close();

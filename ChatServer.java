@@ -33,31 +33,34 @@ public class ChatServer extends Thread {
         this.sock = sock;
     }
 
-    public void remove(Socket socket) {
-        synchronized (ChatServer.Connected_Clients) {
-            for (Server_DATA d : ChatServer.Connected_Clients) {
-                synchronized (sock) {
-                    if (socket == d.Client_sock) {
-                        ChatServer.Connected_Clients.remove(d);
-                        break;
-                    }
-                }
-            }
-        }
-    }
+//    public void remove(Socket socket) {
+//        for (Server_DATA d : ChatServer.Connected_Clients) {
+//            synchronized (sock) {
+//                if (socket == d.Client_sock) {
+//                    ChatServer.Connected_Clients.remove(d);
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     public void ECHO_CONNECT(String ID_, boolean connect_) throws IOException {
+        Server_DATA temp_DATA = null;
         synchronized (ChatServer.Connected_Clients) {
             synchronized (ChatServer.Particiants) {
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                         d.toClient_Obj.writeObject(new login_users(ID_, connect_, ChatServer.Particiants));
                         d.toClient_Obj.flush();
+                    } else {
+                        temp_DATA = d;
                     }
                 }
                 if (!connect_) {
                     if (!Particiants.remove(ID_))
-                        System.out.println("fail");
+                        System.out.println(ID_ + " : P remove fail");
+                    if (!Connected_Clients.remove(temp_DATA))
+                        System.out.println(temp_DATA + " : CC remove fail");
                 }
             }
         }
@@ -66,8 +69,6 @@ public class ChatServer extends Thread {
     public void run() {
         //쓰레드가 할 일
         ObjectInputStream fromClient_Obj;
-
-        user_ temp_USER;
         String temp_string = "";
 
         try {
@@ -75,10 +76,10 @@ public class ChatServer extends Thread {
             this.Client_DATA = new Server_DATA(sock);
             fromClient_Obj = new ObjectInputStream(sock.getInputStream()); //InputStream의 최종 형식을 Object로 설정해줍니다.
 
-            while (true) { //채팅 수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
+            while (true) { //채팅 수신을 기다리는 부분
                 Object temp_Object = fromClient_Obj.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                 if (temp_Object instanceof user_) { //전달받은 객체가 사용자 타입일때
-                    temp_USER = (user_) temp_Object;
+                    user_ temp_USER = (user_) temp_Object;
 
                     if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
                         if (get_User(temp_USER.ID_, temp_USER.PW_.getBytes())) {
@@ -126,11 +127,13 @@ public class ChatServer extends Thread {
                     System.out.println(temp_CHAT);
 
                     if (temp_CHAT.SILENT.compareTo("") == 0) {
-                        db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
-                        for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
-                            if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
-                                d.toClient_Obj.writeObject(temp_CHAT);
-                                d.toClient_Obj.flush();
+                        synchronized (Connected_Clients) {
+                            db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
+                            for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
+                                if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
+                                    d.toClient_Obj.writeObject(temp_CHAT);
+                                    d.toClient_Obj.flush();
+                                }
                             }
                         }
                     } else if (temp_CHAT.SILENT.compareTo("/save_all_chat") == 0) {
@@ -139,12 +142,14 @@ public class ChatServer extends Thread {
                         Client_DATA.toClient_Obj.writeObject(new command(6, true, db.Select_All("user")));
                     } else {//귓속말 상대 배열 반복
                         boolean isntThere = true;
-                        for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
-                            if (sock != d.Client_sock && temp_CHAT.SILENT.compareTo(d.USER_ID) == 0) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
-                                d.toClient_Obj.writeObject(temp_CHAT);
-                                d.toClient_Obj.flush();
-                                isntThere = false;
-                                break;
+                        synchronized (Connected_Clients) {
+                            for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
+                                if (sock != d.Client_sock && temp_CHAT.SILENT.compareTo(d.USER_ID) == 0) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
+                                    d.toClient_Obj.writeObject(temp_CHAT);
+                                    d.toClient_Obj.flush();
+                                    isntThere = false;
+                                    break;
+                                }
                             }
                         }
                         if (isntThere)
@@ -155,7 +160,7 @@ public class ChatServer extends Thread {
                 }
             }
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println(sock + ": 연결 끊김 (" + ex + ")");
+            System.out.println(sock + ": 연결 끊김 접속 오류 (" + ex + ")");
         } catch (Exception ex) {
             System.out.println(sock + ": 연결 끊김 (" + ex + ")");
         } finally {
@@ -164,7 +169,7 @@ public class ChatServer extends Thread {
                     ECHO_CONNECT(Client_DATA.USER_ID, false);
                 }
                 if (sock != null) { //클라이언트가 접속을 종료했을때 소켓을 지우는 부분
-                    remove(sock);
+//                    remove(sock);
                     sock.close();
                 }
             } catch (IOException ex) {
