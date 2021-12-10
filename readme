@@ -7,3 +7,8 @@ command
 CLIENT_UI
 CLIENT_UI_CONNECTOR
 command
+
+#구버전 파일
+ChatClient
+ChatClientV2
+login_page.fxml
