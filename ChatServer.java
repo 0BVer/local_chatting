@@ -106,9 +106,7 @@ public class ChatServer extends Thread {
         ServerSocket serverSock = new ServerSocket(8888);
         System.out.println(serverSock + ": 서버 소켓 생성");
 
-//        jdbc dele = new jdbc(); //데이터베이스 청소
-//        dele.Delete_ALL_chat();
-//        dele.Delete_ALL_user();
+//        clear_DB();
 
         while (true) { //클라이언트의 접속을 대기하는 부분
             if (Connected_Clients.size() < 10) {
@@ -118,6 +116,14 @@ public class ChatServer extends Thread {
         }
     }
 
+    // 데이터베이스 청소
+    private static void clear_DB() throws SQLException {
+        jdbc dele = new jdbc();
+        dele.Delete_ALL_chat();
+        dele.Delete_ALL_user();
+    }
+
+    // 클라이언트로 부터 받은 객체가 user_
     private void get_user_(user_ temp_USER) throws Exception {
         if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
             if (get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes())) {
@@ -160,6 +166,7 @@ public class ChatServer extends Thread {
         }
     }
 
+    // 클라이언트로 부터 받은 객체가 chat_
     private void get_chat_(chat_ temp_CHAT) throws IOException, SQLException {
         System.out.print(sock);
         System.out.println(temp_CHAT);
