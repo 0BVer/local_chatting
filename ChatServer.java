@@ -48,20 +48,20 @@ public class ChatServer extends Thread {
         Server_DATA temp_DATA = null;
         synchronized (ChatServer.Connected_Clients) {
             synchronized (ChatServer.Particiants) {
+                if (!connect_)
+                    if (!Particiants.remove(ID_))
+                        System.out.println(ID_ + " : P remove fail");
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
-                        d.toClient_Obj.writeObject(new login_users(ID_, connect_, ChatServer.Particiants));
+                        d.toClient_Obj.writeObject(new login_users(ID_, connect_, (ArrayList) ChatServer.Particiants.clone()));
                         d.toClient_Obj.flush();
                     } else {
                         temp_DATA = d;
                     }
                 }
-                if (!connect_) {
-                    if (!Particiants.remove(ID_))
-                        System.out.println(ID_ + " : P remove fail");
+                if (!connect_)
                     if (!Connected_Clients.remove(temp_DATA))
                         System.out.println(temp_DATA + " : CC remove fail");
-                }
             }
         }
     }
@@ -160,9 +160,9 @@ public class ChatServer extends Thread {
                 }
             }
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println(sock + ": 연결 끊김 접속 오류 (" + ex + ")");
-        } catch (Exception ex) {
             System.out.println(sock + ": 연결 끊김 (" + ex + ")");
+        } catch (Exception ex) {
+            System.out.println(sock + ": 연결 끊김 원인 알 수 없음 (" + ex + ")");
         } finally {
             try {
                 if (Client_DATA.login_NOW) {

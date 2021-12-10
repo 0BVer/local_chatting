@@ -60,9 +60,6 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
     ObjectOutputStream toServer_Obj;
     ObjectInputStream fromServer_OBJ;
 
-    command temp_COMMAND;
-    chat_ temp_CHAT;
-    login_users temp_LOGIN_USERS;
     String USER_ID = "";
 
     LinkedList<chat_> CHAT_LIST = new LinkedList();
@@ -84,65 +81,11 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                 while (true) { //수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
                     Object temp_Object = (Object) fromServer_OBJ.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                     if (temp_Object instanceof command) { //전달받은 객체가 명령어 타입일때
-                        temp_COMMAND = (command) temp_Object;
-                        if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
-                            if (temp_COMMAND.state) {
-                                synchronized (USER_ID) {
-                                    USER_ID = temp_COMMAND.message;
-                                }
-                                LOGIN_NOW = true;
-                                Platform.runLater(() -> {
-                                    try {
-                                        CHANGE_SCENE();
-                                    } catch (IOException e) {
-                                    }
-                                });
-                            } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
-                            }
-                        } else if (temp_COMMAND.command_type == 2) { //클라이언트의 등록에 대한 응답
-                            if (temp_COMMAND.state) {
-                                Platform.runLater(() -> WARNING_MSG.setText("가입에 성공하였습니다."));
-                            } else {
-                                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
-                            }
-                        } else if (temp_COMMAND.command_type == 5){
-                            SAVE_ALL_("chat", temp_COMMAND.message);
-                        } else if (temp_COMMAND.command_type == 6){
-                            SAVE_ALL_("user", temp_COMMAND.message);
-                        }
+                        get_command_((command) temp_Object);
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
-                        temp_CHAT = (chat_) temp_Object;
-                        synchronized (CHAT_LIST) {
-                            CHAT_LIST.addFirst(temp_CHAT);
-                        }
-                        if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
-                            create_CHAT_BOX_(0, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
-                        else if (temp_CHAT.SILENT.compareTo("") == 0)
-                            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
-                        else
-                            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, true);
+                        get_chat_((chat_) temp_Object);
                     } else if (temp_Object instanceof login_users) {
-                        temp_LOGIN_USERS = (login_users) temp_Object;
-                        String alert_message = "";
-                        if (Participant.isEmpty()) {
-                            Participant = temp_LOGIN_USERS.users_ID_;
-                            alert_message = temp_LOGIN_USERS.ID_ + "님 채팅에 오신것을 환영합니다.";
-                        } else {
-                            if (temp_LOGIN_USERS.state) {
-                                Participant.add(temp_LOGIN_USERS.ID_);
-                                alert_message = temp_LOGIN_USERS.ID_ + "님이 참가했습니다.";
-                            } else {
-                                Participant.remove(temp_LOGIN_USERS.ID_);
-                                alert_message = temp_LOGIN_USERS.ID_ + "님이 퇴장했습니다.";
-                            }
-                        }
-                        String finalAlert_message = alert_message;
-                        create_CHAT_BOX_(0, "SEVER ALERT", finalAlert_message, false);
-                        PARTY_MSG.setText(participant_toString(Participant));
-                        synchronized (CHAT_LIST) {
-                            CHAT_LIST.addFirst(new chat_("SERVER ALERT", finalAlert_message, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
-                        }
+                        get_login_users_((login_users) temp_Object);
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
@@ -163,19 +106,81 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         From_Server.start();
     }
 
-    public String participant_toString(ArrayList<String> participant) {
-        String temp = "";
-        int count = 0;
-        for (String user : participant) {
-            if (user.length() > 0) {
-                temp += user + ", ";
-                count++;
+    private void get_command_(command temp_COMMAND) throws IOException {
+        if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
+            if (temp_COMMAND.state) {
+                USER_ID = temp_COMMAND.message;
+                LOGIN_NOW = true;
+                Platform.runLater(() -> {
+                    try {
+                        CHANGE_SCENE();
+                    } catch (IOException e) {
+                    }
+                });
+            } else {
+                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
             }
+        } else if (temp_COMMAND.command_type == 2) { //클라이언트의 등록에 대한 응답
+            if (temp_COMMAND.state) {
+                Platform.runLater(() -> WARNING_MSG.setText("가입에 성공하였습니다."));
+            } else {
+                Platform.runLater(() -> WARNING_MSG.setText(temp_COMMAND.message));
+            }
+        } else if (temp_COMMAND.command_type == 5) {
+            SAVE_ALL_("chat", temp_COMMAND.message);
+        } else if (temp_COMMAND.command_type == 6) {
+            SAVE_ALL_("user", temp_COMMAND.message);
         }
-        return String.format("Online [%d/10] ", count) + temp.substring(0, temp.length() - 2);
     }
 
-    public void CHANGE_SCENE() throws IOException {
+    private void get_chat_(chat_ temp_CHAT) {
+        synchronized (CHAT_LIST) {
+            CHAT_LIST.addFirst(temp_CHAT);
+        }
+        if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
+            create_CHAT_BOX_(0, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
+        else if (temp_CHAT.SILENT.compareTo("") == 0)
+            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
+        else
+            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, true);
+    }
+
+    private void get_login_users_(login_users temp_LOGIN_USERS){
+        String alert_message = "";
+
+        if (temp_LOGIN_USERS.ID_.compareTo(USER_ID) == 0){
+            alert_message = temp_LOGIN_USERS.ID_ + "님 채팅에 오신것을 환영합니다.";
+            Participant = (ArrayList<String>) temp_LOGIN_USERS.users_ID_.clone();
+        } else {
+            if (temp_LOGIN_USERS.state) {
+                Participant.add(temp_LOGIN_USERS.ID_);
+                alert_message = temp_LOGIN_USERS.ID_ + "님이 참가했습니다.";
+            } else {
+                Participant.remove(temp_LOGIN_USERS.ID_);
+                alert_message = temp_LOGIN_USERS.ID_ + "님이 퇴장했습니다.";
+            }
+        }
+        String finalAlert_message = alert_message;
+        create_CHAT_BOX_(0, "SEVER ALERT", finalAlert_message, false);
+        PARTY_MSG.setText(temp_LOGIN_USERS.toString());
+        synchronized (CHAT_LIST) {
+            CHAT_LIST.addFirst(new chat_("SERVER ALERT", temp_LOGIN_USERS.toString(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
+        }
+    }
+
+//    private String participant_toString(ArrayList<String> participant) {
+//        String temp = "";
+//        int count = 0;
+//        for (String user : participant) {
+//            if (user.length() > 0) {
+//                temp += user + ", ";
+//                count++;
+//            }
+//        }
+//        return String.format("Online [%d/10] ", count) + temp.substring(0, temp.length() - 2);
+//    }
+
+    private void CHANGE_SCENE() throws IOException {
         if (LOGIN_NOW) {
             CHAT_PANE.setVisible(true);
             LOGIN_PANE.setVisible(false);
@@ -236,10 +241,12 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
                 temp = new chat_(USER_ID, TXT_CHAT.getText(), time_);
                 create_CHAT_BOX_(1, time_, TXT_CHAT.getText(), false);
                 TXT_CHAT.setText("");
-            } else {
+            } else if (Participant.contains(SILENT_ID.getText())){
                 temp = new chat_(USER_ID, TXT_CHAT.getText(), time_, SILENT_ID.getText());
                 create_CHAT_BOX_(1, time_, TXT_CHAT.getText(), true);
                 TXT_CHAT.setText("");
+            } else {
+                create_CHAT_BOX_(0, time_, SILENT_ID.getText() + "님을 서버에서 찾을 수 없습니다.", true);
             }
 
             toServer_Obj.writeObject(temp);
@@ -249,7 +256,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
             }
 
             //채팅을 보냈을때 메뉴가 열려있으면 닫는 기능
-            if (MENU_CLOSE_BT.isVisible()){
+            if (MENU_CLOSE_BT.isVisible()) {
                 MENU_CLOSE(new ActionEvent());
             }
         }
@@ -276,7 +283,7 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
         IN_PANE.setPrefHeight(37 + CHAT_FIELD.getLayoutBounds().getHeight());
         IN_PANE.setPrefWidth(375);
 
-        if (SENDER == 0) { //서버
+        if (SENDER == 0) { //서버, 시스템
             IN_PANE.setPrefWidth(500);
             IN_PANE.setStyle("-fx-background-color: #C4C4C4;");
         } else if (SENDER == 1) { //수신
@@ -308,16 +315,15 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
 
     public void SAVE_CHAT(ActionEvent actionEvent) throws IOException {
         String chat_log = "";
-        synchronized (CHAT_LIST) {
-            for (chat_ temp : CHAT_LIST) {
-                chat_log = temp.toString() + '\n' + chat_log;
-            }
-            String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            chat_log = String.format("---%s님의 %s 채팅 기록---\n", USER_ID, today) + chat_log;
-            FileOutputStream txt_saver = new FileOutputStream(String.format("chatlog_%s.txt", today));
-            txt_saver.write(chat_log.getBytes(StandardCharsets.UTF_8));
-            txt_saver.close();
+        for (chat_ temp : CHAT_LIST) {
+            chat_log = temp.toString() + '\n' + chat_log;
         }
+        String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        chat_log = String.format("---%s님의 %s 채팅 기록---\n", USER_ID, today) + chat_log;
+        FileOutputStream txt_saver = new FileOutputStream(String.format("chatlog_%s.txt", today));
+        txt_saver.write(chat_log.getBytes(StandardCharsets.UTF_8));
+        txt_saver.close();
+
     }
 
     public void SAVE_ALL_(String table, String all) throws IOException {
