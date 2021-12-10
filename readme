@@ -1,9 +1,0 @@
-# 서버
-ChatServer
-jdbc
-command
-
-# 클라이언트
-CLIENT_UI
-CLIENT_UI_CONNECTOR
-command
