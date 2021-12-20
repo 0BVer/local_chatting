@@ -10,15 +10,23 @@ public class jdbc {
 
     public jdbc(){
         try {
-            com.mysql.cj.jdbc.Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
-            DriverManager.registerDriver(mysqlDriver);
+//            com.mysql.cj.jdbc.Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
+//            DriverManager.registerDriver(mysqlDriver);
+
+//            mysql jdbc 연결
+//            con = DriverManager.getConnection(
+//                    "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
+//                    "root", /* 해당 DB를 사용할 수 있는 아이디*/
+//                    "1234" /* 사용자 암호 */);
 
             con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
-                    "root", /* 해당 DB를 사용할 수 있는 아이디*/
-                    "1234" /* 사용자 암호 */);
+                    "jdbc:oracle:thin:@localhost:1521:xe",  /* 연결할 DMBS와 데이터베이스 정보 */
+                    "jdbc_con", /* 해당 DB를 사용할 수 있는 아이디*/
+                    "1469" /* 사용자 암호 */);
 
-            System.out.println("DBMS와 연결되었음!");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+
+            System.out.println(con.isClosed()?"DBMS와 접속 실패":"DBMS와 접속 성공");
 
 //            result.close();
 //            state.close();
@@ -29,6 +37,10 @@ public class jdbc {
             System.out.print("사유 : " + e.getMessage());
         } catch (Exception e) {
         }
+    }
+
+    public static void main(String[] args) {
+        new jdbc();
     }
 
 
