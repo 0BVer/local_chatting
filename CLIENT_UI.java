@@ -18,7 +18,7 @@ public class CLIENT_UI extends Application {
     public void start(Stage primaryStage) throws Exception {
         AnchorPane root;
 
-        root = (AnchorPane) FXMLLoader.load(getClass().getResource("CHAT_UI.fxml"));
+        root = (AnchorPane) FXMLLoader.load(getClass().getResource("../CHAT_UI.fxml"));
         Scene scene = new Scene(root, 550, 950);
         scene.getStylesheets().add(getClass().getResource("global_style.css").toExternalForm());
         primaryStage.initStyle(StageStyle.UNDECORATED);

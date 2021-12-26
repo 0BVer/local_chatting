@@ -27,7 +27,7 @@ public class ChatServer extends Thread {
     private static final ArrayList<Server_DATA> Connected_Clients = new ArrayList<>(10); //클라이언트 소켓을 담는 배열 (비공개)
 
     private static final int SALT_SIZE = 16;
-    private static final jdbc db = new jdbc();
+    private static final MySql_jdbc db = new MySql_jdbc();
 
     public ChatServer(Socket sock) {
         this.sock = sock;
@@ -118,7 +118,7 @@ public class ChatServer extends Thread {
 
     // 데이터베이스 청소
     private static void clear_DB() throws SQLException {
-        jdbc dele = new jdbc();
+        MySql_jdbc dele = new MySql_jdbc();
         dele.Delete_ALL_chat();
         dele.Delete_ALL_user();
     }

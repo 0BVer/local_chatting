@@ -2,23 +2,16 @@ package chat;
 
 import java.sql.*;
 
-public class jdbc {
+public class Oracle_jdbc {
     private Connection con;
     private PreparedStatement state;
     private ResultSet result;
     private String sql;
 
-    public jdbc(){
+    // SQL문 수정 필요
+
+    public Oracle_jdbc(){
         try {
-//            com.mysql.cj.jdbc.Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
-//            DriverManager.registerDriver(mysqlDriver);
-
-//            mysql jdbc 연결
-//            con = DriverManager.getConnection(
-//                    "jdbc:mysql://localhost:3306/chat_log",  /* 연결할 DMBS와 데이터베이스 정보 */
-//                    "root", /* 해당 DB를 사용할 수 있는 아이디*/
-//                    "1234" /* 사용자 암호 */);
-
             con = DriverManager.getConnection(
                     "jdbc:oracle:thin:@localhost:1521:xe",  /* 연결할 DMBS와 데이터베이스 정보 */
                     "jdbc_con", /* 해당 DB를 사용할 수 있는 아이디*/
@@ -40,7 +33,7 @@ public class jdbc {
     }
 
     public static void main(String[] args) {
-        new jdbc();
+        new MySql_jdbc();
     }
 
 
