@@ -106,14 +106,16 @@ public class ChatServer extends Thread {
         ServerSocket serverSock = new ServerSocket(8888);
         System.out.println(serverSock + ": 서버 소켓 생성");
 
+        Oracle_jdbc od = new Oracle_jdbc();
+        od.temp();
 //        clear_DB();
 
-        while (true) { //클라이언트의 접속을 대기하는 부분
-            if (Connected_Clients.size() < 10) {
-                ChatServer myServer = new ChatServer(serverSock.accept());
-                myServer.start();
-            }
-        }
+//        while (true) { //클라이언트의 접속을 대기하는 부분
+//            if (Connected_Clients.size() < 10) {
+//                ChatServer myServer = new ChatServer(serverSock.accept());
+//                myServer.start();
+//            }
+//        }
     }
 
     // 데이터베이스 청소

@@ -13,7 +13,7 @@ public class Oracle_jdbc {
     public Oracle_jdbc(){
         try {
             con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:xe",  /* 연결할 DMBS와 데이터베이스 정보 */
+                    "jdbc:oracle:thin:@localhost:49161:xe",  /* 연결할 DMBS와 데이터베이스 정보 */
                     "jdbc_con", /* 해당 DB를 사용할 수 있는 아이디*/
                     "1469" /* 사용자 암호 */);
 
@@ -33,7 +33,21 @@ public class Oracle_jdbc {
     }
 
     public static void main(String[] args) {
-        new MySql_jdbc();
+        new Oracle_jdbc();
+    }
+
+    public String temp() throws SQLException {
+        try {
+            sql = String.format("INSERT into user_INDEX_T values('COUNT_UP_INDEX');");
+
+            state = con.prepareStatement(sql);
+            state.executeUpdate(); //Update, Insert, Delete
+
+            return "";
+
+        } catch (SQLException ex){
+            return "중복된 ID가 이미 있습니다.";
+        }
     }
 
 
