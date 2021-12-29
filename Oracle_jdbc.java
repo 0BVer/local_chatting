@@ -38,12 +38,13 @@ public class Oracle_jdbc {
 
     public String temp() throws SQLException {
         try {
-            sql = String.format("INSERT into user_INDEX_T values('COUNT_UP_INDEX');");
-
+            sql = String.format("insert into user_INDEX_T values (COUNT_UP_INDEX.nextval)");
             state = con.prepareStatement(sql);
             state.executeUpdate(); //Update, Insert, Delete
 
             return "";
+
+//            sql = "SELECT * from %s";
 
         } catch (SQLException ex){
             return "중복된 ID가 이미 있습니다.";
@@ -53,10 +54,14 @@ public class Oracle_jdbc {
 
     public String Insert_user(String ID_, String PW_, String Salt_) throws SQLException {
         try {
-            sql = String.format("INSERT into user values('%s', '%s', '%s', now());", ID_, PW_, Salt_);
+            sql = String.format("INSERT into user_ID_T values ('%s');", ID_, PW_, Salt_);
+
 
             state = con.prepareStatement(sql);
             state.executeUpdate(); //Update, Insert, Delete
+
+            sql = String.format("INSERT into user_ID_T values ('%s');", ID_, PW_, Salt_);
+
 
             return "";
 
