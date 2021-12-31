@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-public class command implements Serializable {
+public class command implements Serializable, Cloneable{
     int command_type;
     boolean state;
     String message;
@@ -18,40 +18,20 @@ public class command implements Serializable {
 }
 
 class chat_ implements Serializable {
-    String ID_ = "unknown";
+    int SENDER_INDEX;
+    int RECEIVER_INDEX;
+    boolean ISIT_group = false;
     String chat_TEXT_ = "";
-    String upload_TIME_ = "";
-    String SILENT = "";
 
-    chat_(String ID_, String chat_TEXT_, String upload_TIME_) {
-        this.ID_ = ID_;
+    chat_(int SENDER_INDEX, int RECEIVER_INDEX, boolean ISIT_group, String chat_TEXT_){
+        this.SENDER_INDEX = SENDER_INDEX;
+        this.RECEIVER_INDEX = RECEIVER_INDEX;
+        this.ISIT_group = ISIT_group;
         this.chat_TEXT_ = chat_TEXT_;
-        this.upload_TIME_ = upload_TIME_;
-    }
-
-    chat_(String ID_, String chat_TEXT_, String upload_TIME_, String SILENT) {
-        this.ID_ = ID_;
-        this.chat_TEXT_ = chat_TEXT_;
-        this.upload_TIME_ = upload_TIME_;
-        this.SILENT = SILENT;
-    }
-
-    @Override
-    public String toString() {
-        if (SILENT.compareTo("") != 0)
-            return "[" + ID_ + " -> " + SILENT +
-                    " | " + chat_TEXT_ +
-                    " | " + upload_TIME_ +
-                    ']';
-        else
-            return "[" + ID_ +
-                    " | " + chat_TEXT_ +
-                    " | " + upload_TIME_ +
-                    ']';
     }
 }
 
-class user_ implements Serializable {
+class user_ implements Serializable, Cloneable {
     String ID_ = "";
     String PW_ = "";
     int login_ = 0; //0:로그인 시도중, 1:로그인 완료, 2:등록
@@ -82,29 +62,8 @@ class user_ implements Serializable {
         }
         return sb.toString();
     }
-}
 
-class login_users implements Serializable {
-    String ID_ = "";
-    boolean state;
-    ArrayList<String> users_ID_;
-
-    login_users(String ID_, boolean state, ArrayList users_ID_) {
-        this.ID_ = ID_;
-        this.state = state;
-        this.users_ID_ = users_ID_;
-    }
-
-    @Override
-    public String toString() {
-        String temp = "";
-        int count = 0;
-        for (String user : users_ID_) {
-            if (user.length() > 0) {
-                temp += user + ", ";
-                count++;
-            }
-        }
-        return String.format("Online [%d/10] ", count) + temp.substring(0, temp.length() - 2);
+    protected user_ clone() throws CloneNotSupportedException {
+        return (user_) super.clone();
     }
 }

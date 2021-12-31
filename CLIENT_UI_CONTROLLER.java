@@ -1,4 +1,4 @@
-package chat;
+/*package chat;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -375,4 +375,4 @@ public class CLIENT_UI_CONTROLLER implements Initializable {
 
     }
 
-}
+}*/

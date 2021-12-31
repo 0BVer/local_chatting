@@ -23,8 +23,9 @@ public class SIGNUP_GUI extends JFrame {
         PW_TF = new JPasswordField(10);
         PWCF_LB = new JLabel("PW Confirm");
         PWCF_TF = new JPasswordField(10);
-        CONFIRM_BT = new JButton("Sign in");
-        SIGN_MODE_BT = new JButton("Sign up");
+        CONFIRM_BT = new JButton("Sign Up");
+        SIGN_MODE_BT = new JButton("CLOSE");
+        SIGN_MODE_BT.setVisible(false);
 
         WARNING_LB = new JLabel("");
 
@@ -34,8 +35,9 @@ public class SIGNUP_GUI extends JFrame {
         SIGNUP_P.add(PW_TF);
         SIGNUP_P.add(PWCF_LB);
         SIGNUP_P.add(PWCF_TF);
-        SIGNUP_P.add(CONFIRM_BT);
         SIGNUP_P.add(SIGN_MODE_BT);
+        SIGNUP_P.add(CONFIRM_BT);
+
 
         CP.add(SIGNUP_P);
         CP.add(WARNING_LB);

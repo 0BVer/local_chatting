@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 class Server_DATA {
     final Socket Client_sock;
+    int user_INDEX = 0;
     String USER_ID = "";
     boolean login_NOW = false;
     ObjectOutputStream toClient_Obj;
@@ -27,34 +28,25 @@ public class ChatServer extends Thread {
     private static final ArrayList<Server_DATA> Connected_Clients = new ArrayList<>(10); //클라이언트 소켓을 담는 배열 (비공개)
 
     private static final int SALT_SIZE = 16;
-    private static final MySql_jdbc db = new MySql_jdbc();
+    private static final Oracle_jdbc db = new Oracle_jdbc();
 
     public ChatServer(Socket sock) {
         this.sock = sock;
     }
 
-//    public void remove(Socket socket) {
-//        for (Server_DATA d : ChatServer.Connected_Clients) {
-//            synchronized (sock) {
-//                if (socket == d.Client_sock) {
-//                    ChatServer.Connected_Clients.remove(d);
-//                    break;
-//                }
-//            }
-//        }
-//    }
+    private static int user_INDEX = 0;
 
-    public void ECHO_CONNECT(String ID_, boolean connect_) throws IOException {
+    public void ECHO_CONNECT(String user_INDEX, boolean connect_) throws IOException {
         Server_DATA temp_DATA = null;
         synchronized (ChatServer.Connected_Clients) {
             synchronized (ChatServer.Particiants) {
                 if (!connect_)
-                    if (!Particiants.remove(ID_))
-                        System.out.println(ID_ + " : P remove fail");
+                    if (!Particiants.remove(user_INDEX))
+                        System.out.println(user_INDEX + " : P remove fail");
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
-                        d.toClient_Obj.writeObject(new login_users(ID_, connect_, (ArrayList) ChatServer.Particiants.clone()));
-                        d.toClient_Obj.flush();
+                    //    d.toClient_Obj.writeObject(new login_users(user_INDEX, connect_, (ArrayList) ChatServer.Particiants.clone()));
+                    //    d.toClient_Obj.flush();
                     } else {
                         temp_DATA = d;
                     }
@@ -76,10 +68,10 @@ public class ChatServer extends Thread {
             this.Client_DATA = new Server_DATA(sock);
             fromClient_Obj = new ObjectInputStream(sock.getInputStream()); //InputStream의 최종 형식을 Object로 설정해줍니다.
 
-            while (true) { //채팅 수신을 기다리는 부분
+            while (true) { //수신을 기다리는 부분
                 Object temp_Object = fromClient_Obj.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                 if (temp_Object instanceof user_) { //전달받은 객체가 사용자 타입일때
-                    get_user_((user_) temp_Object);
+                    get_user_(((user_) temp_Object));
                 } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                     get_chat_((chat_) temp_Object);
                 }
@@ -106,29 +98,31 @@ public class ChatServer extends Thread {
         ServerSocket serverSock = new ServerSocket(8888);
         System.out.println(serverSock + ": 서버 소켓 생성");
 
-        Oracle_jdbc od = new Oracle_jdbc();
-        od.temp();
+//        Oracle_jdbc dd = new Oracle_jdbc();
+//        System.out.println(dd.check("admin", "PW"));
 //        clear_DB();
 
-//        while (true) { //클라이언트의 접속을 대기하는 부분
-//            if (Connected_Clients.size() < 10) {
-//                ChatServer myServer = new ChatServer(serverSock.accept());
-//                myServer.start();
-//            }
-//        }
+        while (true) { //클라이언트의 접속을 대기하는 부분
+            if (Connected_Clients.size() < 10) {
+                ChatServer myServer = new ChatServer(serverSock.accept());
+                myServer.start();
+            }
+        }
     }
 
     // 데이터베이스 청소
-    private static void clear_DB() throws SQLException {
-        MySql_jdbc dele = new MySql_jdbc();
-        dele.Delete_ALL_chat();
-        dele.Delete_ALL_user();
-    }
+//    private static void clear_DB() throws SQLException {
+//        MySql_jdbc dele = new MySql_jdbc();
+//        dele.Delete_ALL_chat();
+//        dele.Delete_ALL_user();
+//    }
 
     // 클라이언트로 부터 받은 객체가 user_
     private void get_user_(user_ temp_USER) throws Exception {
+        System.out.println(temp_USER.ID_ + "----");
         if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
-            if (get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes())) {
+            Client_DATA.user_INDEX = get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
+            if (Client_DATA.user_INDEX != 0) {
                 synchronized (ChatServer.Connected_Clients) {
                     if (ChatServer.Connected_Clients.size() >= 10) {
                         Client_DATA.toClient_Obj.writeObject(new command(1, false, "서버의 정원이 가득 찼습니다."));
@@ -143,12 +137,12 @@ public class ChatServer extends Thread {
                     Client_DATA.toClient_Obj.flush();
                 }
                 synchronized (ChatServer.Particiants) {
-                    ChatServer.Particiants.add(temp_USER.ID_);
-                    Client_DATA.toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
+                    ChatServer.Particiants.add(String.valueOf(user_INDEX));
+                    //Client_DATA.toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
                     Client_DATA.toClient_Obj.flush();
                 }
 
-                ECHO_CONNECT(Client_DATA.USER_ID, true);
+                ECHO_CONNECT(String.valueOf(Client_DATA.user_INDEX), true);
 
                 System.out.println(sock + " : 로그인 성공");
             } else {
@@ -156,8 +150,8 @@ public class ChatServer extends Thread {
                 System.out.println(sock + " : 로그인 실패");
             }
         } else if (temp_USER.login_ == 2) { //클라이언트의 등록 시도
+            System.out.println(temp_USER.ID_ + "--------------");
             String temp_string = set_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
-
             if (temp_string == "") {
                 Client_DATA.toClient_Obj.writeObject(new command(2, true, "등록 성공"));
                 System.out.println(sock + " : 등록 성공");
@@ -173,9 +167,9 @@ public class ChatServer extends Thread {
         System.out.print(sock);
         System.out.println(temp_CHAT);
 
-        if (temp_CHAT.SILENT.compareTo("") == 0) {
+        if (temp_CHAT.ISIT_group) {
             synchronized (Connected_Clients) {
-                db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
+                db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, true, temp_CHAT.chat_TEXT_);
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                         d.toClient_Obj.writeObject(temp_CHAT);
@@ -183,26 +177,17 @@ public class ChatServer extends Thread {
                     }
                 }
             }
-        } else if (temp_CHAT.SILENT.compareTo("/save_all_chat") == 0) {
-            Client_DATA.toClient_Obj.writeObject(new command(5, true, db.Select_All("chat")));
-        } else if (temp_CHAT.SILENT.compareTo("/save_all_user") == 0) {
-            Client_DATA.toClient_Obj.writeObject(new command(6, true, db.Select_All("user")));
-        } else {//귓속말 상대 배열 반복
-            boolean isntThere = true;
+        } else {
             synchronized (Connected_Clients) {
+                db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, false, temp_CHAT.chat_TEXT_);
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
-                    if (sock != d.Client_sock && temp_CHAT.SILENT.compareTo(d.USER_ID) == 0) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
+                    if (sock != d.Client_sock && temp_CHAT.RECEIVER_INDEX == d.user_INDEX) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
                         d.toClient_Obj.writeObject(temp_CHAT);
                         d.toClient_Obj.flush();
-                        isntThere = false;
                         break;
                     }
                 }
             }
-            if (isntThere) //귓속말 상대가 없을 경우 (클라이언트에서 한번 확인하지만 이중 확인으로 추가)
-                Client_DATA.toClient_Obj.writeObject(new chat_("SERVER ALERT", "상대방을 서버에서 찾을 수 없습니다.", "", Client_DATA.USER_ID));
-            else
-                db.Insert_chat(temp_CHAT.ID_, temp_CHAT.chat_TEXT_, temp_CHAT.upload_TIME_, temp_CHAT.SILENT);
         }
     }
 
@@ -213,7 +198,7 @@ public class ChatServer extends Thread {
     }
 
     // 유저 정보와 대조한 뒤 로그인 하기
-    private boolean get_User_JDBC(String ID_, byte[] password_) throws Exception {
+    private int get_User_JDBC(String ID_, byte[] password_) throws Exception {
         String temp_salt = db.get_SALT(ID_); // 해당 ID의 SALT 값을 찾는다
         String temp_pass = Hashing(password_, temp_salt); // 얻어온 Salt 와 password 를 조합해본다.
 

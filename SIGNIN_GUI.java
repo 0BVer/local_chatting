@@ -19,7 +19,7 @@ public class SIGNIN_GUI extends JFrame {
         setSize(400, 500);
         CP.setLayout(null);
 
-        SIGN_IN_P = new JPanel(new GridLayout(3,1, 10, 10));
+        SIGN_IN_P = new JPanel(new GridLayout(3,2, 10, 10));
         SIGN_IN_P.setBorder(new TitledBorder(new LineBorder(Color.BLACK)));
         SIGN_IN_P.setBounds(100, 50, 200, 100);
 
@@ -33,6 +33,7 @@ public class SIGNIN_GUI extends JFrame {
         SIGN_MODE_BT = new JButton("Sign up");
 
         WARNING_LB = new JLabel("");
+        WARNING_LB.setBounds(100, 200, 200, 10);
 
         SIGN_IN_P.add(ID_LB);
         SIGN_IN_P.add(ID_TF);
@@ -40,9 +41,10 @@ public class SIGNIN_GUI extends JFrame {
         SIGN_IN_P.add(PW_TF);
         SIGN_IN_P.add(CONFIRM_BT);
         SIGN_IN_P.add(SIGN_MODE_BT);
-        SIGN_IN_P.add(WARNING_LB);
+
 
         CP.add(SIGN_IN_P);
+        CP.add(WARNING_LB);
         setVisible(true);
     }
 }

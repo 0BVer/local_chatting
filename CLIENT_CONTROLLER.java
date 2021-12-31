@@ -37,7 +37,6 @@ public class CLIENT_CONTROLLER {
         SIGN_UP_VIEW.CONFIRM_BT.addActionListener(this::Sign_UP_Action);
 
         try {
-//            sock = new Socket("creater.iptime.org", 58088);
             sock = new Socket("localhost", 8888);
             toServer_Obj = new ObjectOutputStream(sock.getOutputStream());
             fromServer_OBJ = new ObjectInputStream(sock.getInputStream());
@@ -49,18 +48,15 @@ public class CLIENT_CONTROLLER {
                 while (true) { //수신을 기다리는 부분 (스트림이 종료되면 -1이 됨)
                     Object temp_Object = (Object) fromServer_OBJ.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                     if (temp_Object instanceof command) { //전달받은 객체가 명령어 타입일때
-//                        get_command_((command) temp_Object);
+                        get_command_((command) temp_Object);
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
 //                        get_chat_((chat_) temp_Object);
-                    } else if (temp_Object instanceof login_users) {
+//                    } else if (temp_Object instanceof login_users) {
 //                        get_login_users_((login_users) temp_Object);
                     }
                 }
             } catch (IOException | ClassNotFoundException ex) {
-                Platform.runLater(() -> {
-//                    WARNING_MSG.setText("서버를 찾을 수 없습니다. 다시 접속해 주세요");
-//                    TITLE_MSG.setText("CONNECTION LOST");
-                });
+
                 System.out.println("연결 종료 (" + ex + ")");
             } finally {
                 try {
@@ -109,7 +105,7 @@ public class CLIENT_CONTROLLER {
 //            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, true);
 //    }
 
-    private void get_login_users_(login_users temp_LOGIN_USERS){
+/*    private void get_login_users_(login_users temp_LOGIN_USERS){
         String alert_message = "";
 
         if (temp_LOGIN_USERS.ID_.compareTo(USER_ID) == 0){
@@ -130,7 +126,7 @@ public class CLIENT_CONTROLLER {
         synchronized (CHAT_LIST) {
             CHAT_LIST.addFirst(new chat_("SERVER ALERT", temp_LOGIN_USERS.toString(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"))));
         }
-    }
+    }*/
 
     public void Sign_IN_Action(ActionEvent e) {
         try {
@@ -140,7 +136,7 @@ public class CLIENT_CONTROLLER {
                 } else if (SIGN_IN_VIEW.PW_TF.getText().length() == 0) {
                     SIGN_IN_VIEW.WARNING_LB.setText("PW를 입력해주십시오.");
                 } else {
-                    toServer_Obj.writeObject(new user_(SIGN_IN_VIEW.ID_TF.getText(), SIGN_IN_VIEW.PW_TF.getText(), 0));
+                    toServer_Obj.writeObject(new user_(SIGN_IN_VIEW.ID_TF.getText(), SIGN_IN_VIEW.PW_TF.getText(), 0).clone());
                     toServer_Obj.flush();
                 }
             } else if (e.getSource()== SIGN_IN_VIEW.SIGN_MODE_BT){ //로그인 창 가입 버튼
@@ -150,6 +146,8 @@ public class CLIENT_CONTROLLER {
             SIGN_IN_VIEW.setTitle("Lost Connection");
             SIGN_UP_VIEW.setTitle("Lost Connection");
 
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -162,16 +160,19 @@ public class CLIENT_CONTROLLER {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW를 입력해주십시오.");
                 } else if (SIGN_UP_VIEW.PWCF_TF.getText().length() == 0) {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW Confirm을 입력해주십시오.");
-                } else if (SIGN_UP_VIEW.PW_TF.getText().compareTo(SIGN_UP_VIEW.PWCF_TF.getText()) == 0) {
+                } else if (SIGN_UP_VIEW.PW_TF.getText().compareTo(SIGN_UP_VIEW.PWCF_TF.getText()) != 0) {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW와 PW Confirm이 일치하지 않습니다.");
                 } else {
-                    toServer_Obj.writeObject(new user_(SIGN_IN_VIEW.ID_TF.getText(), SIGN_IN_VIEW.PW_TF.getText(), 2));
+                    SIGN_UP_VIEW.WARNING_LB.setText("");
+                    toServer_Obj.writeObject(new user_(SIGN_UP_VIEW.ID_TF.getText(), SIGN_UP_VIEW.PW_TF.getText(), 2));
                     toServer_Obj.flush();
                 }
             }
         }catch (IOException | NoSuchAlgorithmException ex){
             SIGN_IN_VIEW.setTitle("Lost Connection");
             SIGN_UP_VIEW.setTitle("Lost Connection");
+//        } catch (CloneNotSupportedException ex) {
+//            ex.printStackTrace();
         }
     }
 
