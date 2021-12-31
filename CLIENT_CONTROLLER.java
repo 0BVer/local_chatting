@@ -1,7 +1,5 @@
 package chat;
 
-import javafx.application.Platform;
-
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,6 +14,7 @@ import java.util.LinkedList;
 public class CLIENT_CONTROLLER {
     SIGNIN_GUI SIGN_IN_VIEW;
     SIGNUP_GUI SIGN_UP_VIEW;
+    CHAT_GUI CHAT_VIEW;
 
     private boolean LOGIN_NOW = false;
     private boolean register_mode = false;
@@ -24,6 +23,7 @@ public class CLIENT_CONTROLLER {
     ObjectOutputStream toServer_Obj;
     ObjectInputStream fromServer_OBJ;
 
+    int user_INDEX = 0;
     String USER_ID = "";
 
     LinkedList<chat_> CHAT_LIST = new LinkedList();
@@ -32,9 +32,12 @@ public class CLIENT_CONTROLLER {
     CLIENT_CONTROLLER(){
         SIGN_IN_VIEW = new SIGNIN_GUI();
         SIGN_UP_VIEW = new SIGNUP_GUI();
+        CHAT_VIEW = new CHAT_GUI();
+
         SIGN_IN_VIEW.CONFIRM_BT.addActionListener(this::Sign_IN_Action);
         SIGN_IN_VIEW.SIGN_MODE_BT.addActionListener(this::Sign_IN_Action);
         SIGN_UP_VIEW.CONFIRM_BT.addActionListener(this::Sign_UP_Action);
+        CHAT_VIEW.SEND_BT.addActionListener(this::Send_Action);
 
         try {
             sock = new Socket("localhost", 8888);
@@ -76,7 +79,9 @@ public class CLIENT_CONTROLLER {
             if (temp_COMMAND.state) {
                 USER_ID = temp_COMMAND.message;
                 LOGIN_NOW = true;
-//                CHANGE_SCENE();
+                SIGN_IN_VIEW.setVisible(false);
+                CHAT_VIEW.setVisible(true);
+
             } else {
                 SIGN_IN_VIEW.WARNING_LB.setText(temp_COMMAND.message);
             }
@@ -173,6 +178,23 @@ public class CLIENT_CONTROLLER {
             SIGN_UP_VIEW.setTitle("Lost Connection");
 //        } catch (CloneNotSupportedException ex) {
 //            ex.printStackTrace();
+        }
+    }
+
+    private void Send_Action(ActionEvent actionEvent) {
+        try {
+            //        String time_;
+            if (CHAT_VIEW.CHAT_TF.getText().length() > 0) {
+//            time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
+                int reseiver_INDEX = 0;
+                boolean ISIT_group = false;
+                chat_ temp_chat = null;
+                toServer_Obj.writeObject(temp_chat= new chat_(user_INDEX, reseiver_INDEX, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
+                toServer_Obj.flush();
+                CHAT_LIST.addFirst(temp_chat);
+            }
+        } catch (IOException ex){
+
         }
     }
 

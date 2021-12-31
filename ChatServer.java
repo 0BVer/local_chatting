@@ -83,7 +83,7 @@ public class ChatServer extends Thread {
         } finally {
             try {
                 if (Client_DATA.login_NOW) {
-                    ECHO_CONNECT(Client_DATA.USER_ID, false);
+                    ECHO_CONNECT(String.valueOf(Client_DATA.user_INDEX), false);
                 }
                 if (sock != null) { //클라이언트가 접속을 종료했을때 소켓을 지우는 부분
 //                    remove(sock);
@@ -122,6 +122,7 @@ public class ChatServer extends Thread {
         System.out.println(temp_USER.ID_ + "----");
         if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
             Client_DATA.user_INDEX = get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
+            System.out.println(Client_DATA.user_INDEX);
             if (Client_DATA.user_INDEX != 0) {
                 synchronized (ChatServer.Connected_Clients) {
                     if (ChatServer.Connected_Clients.size() >= 10) {
@@ -137,7 +138,7 @@ public class ChatServer extends Thread {
                     Client_DATA.toClient_Obj.flush();
                 }
                 synchronized (ChatServer.Particiants) {
-                    ChatServer.Particiants.add(String.valueOf(user_INDEX));
+                    ChatServer.Particiants.add(String.valueOf(Client_DATA.user_INDEX));
                     //Client_DATA.toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
                     Client_DATA.toClient_Obj.flush();
                 }

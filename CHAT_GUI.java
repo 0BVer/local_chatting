@@ -5,9 +5,8 @@ import java.awt.*;
 
 public class CHAT_GUI extends JFrame {
     Container CP;
-    JPanel CHAT_SUBBOX_P;
-    JLabel WARNING_LB;
-    JTextField CHAT_TF;
+    JPanel CHAT_HEADBOX_P, CHAT_FOOTBOX_P;
+    JTextField CHAT_TF, RECEIVER_TF;
     JButton SEND_BT;
     JTextArea CHATBOX_TA;
     JScrollPane CHAT_MAINBOX_SP;
@@ -19,26 +18,34 @@ public class CHAT_GUI extends JFrame {
         setSize(400, 700);
         CP.setLayout(new BorderLayout());
 
+
+        RECEIVER_TF = new JTextField();
+
+        CHAT_HEADBOX_P = new JPanel(new BorderLayout());
+        CHAT_HEADBOX_P.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        CHAT_HEADBOX_P.add(RECEIVER_TF, BorderLayout.CENTER);
+
         CHATBOX_TA = new JTextArea();
 
         CHAT_MAINBOX_SP = new JScrollPane(CHATBOX_TA);
         CHAT_MAINBOX_SP.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        CHAT_SUBBOX_P = new JPanel(new BorderLayout());
-        CHAT_SUBBOX_P.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        CHAT_FOOTBOX_P = new JPanel(new BorderLayout());
+        CHAT_FOOTBOX_P.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         CHAT_TF = new JTextField();
         SEND_BT = new JButton("Send");
 
-        CHAT_SUBBOX_P.add(CHAT_TF, BorderLayout.CENTER);
-        CHAT_SUBBOX_P.add(SEND_BT, BorderLayout.EAST);
+        CHAT_FOOTBOX_P.add(CHAT_TF, BorderLayout.CENTER);
+        CHAT_FOOTBOX_P.add(SEND_BT, BorderLayout.EAST);
 
+        CP.add(CHAT_HEADBOX_P, BorderLayout.NORTH);
         CP.add(CHAT_MAINBOX_SP, BorderLayout.CENTER);
-        CP.add(CHAT_SUBBOX_P, BorderLayout.SOUTH);
+        CP.add(CHAT_FOOTBOX_P, BorderLayout.SOUTH);
 
-        setVisible(true);
+        setVisible(false);
     }
 
-    public static void main(String[] args) {
-        new CHAT_GUI();
-    }
+//    public static void main(String[] args) {
+//        new CHAT_GUI();
+//    }
 }
