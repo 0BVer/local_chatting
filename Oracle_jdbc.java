@@ -81,7 +81,7 @@ public class Oracle_jdbc {
 //    }
 
     public void Insert_chat(int SENDER_INDEX_, int RECEIVER_INDEX, boolean ISIT_group, String Chat_) throws SQLException {
-        sql = String.format("insert into chat_ (chat_INDEX, sender_INDEX, receiver_INDEX, ISIT_group, chat_CONTENTS) values (\"COUNT_UP_chat_INDEX\".nextval, %d, %d, %d, 'hello world')", SENDER_INDEX_, RECEIVER_INDEX, ISIT_group==false?0:1, Chat_);
+        sql = String.format("insert into chat_ (chat_INDEX, sender_INDEX, receiver_INDEX, ISIT_group, chat_CONTENTS) values (\"COUNT_UP_chat_INDEX\".nextval, %d, %d, %d, '%s')", SENDER_INDEX_, RECEIVER_INDEX, ISIT_group==false?0:1, Chat_);
         state = con.prepareStatement(sql);
         state.executeUpdate(); //Update, Insert, Delete
     }

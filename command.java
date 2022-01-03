@@ -3,7 +3,6 @@ package chat;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
 public class command implements Serializable, Cloneable{
     int command_type;
@@ -31,15 +30,33 @@ class chat_ implements Serializable {
     }
 }
 
-class user_ implements Serializable, Cloneable {
+class user_DATA implements Serializable, Cloneable{
+    int INDEX_ = 0;
+    String ID_ = "";
+    String NN_ = "";
+
+    user_DATA(int INDEX_, String ID_, String NN_){
+        this.INDEX_ = INDEX_;
+        this.ID_ = ID_;
+        this.NN_ = NN_;
+    }
+
+    protected user_DATA clone() throws CloneNotSupportedException {
+        return (user_DATA) super.clone();
+    }
+}
+
+class user_SIGN implements Serializable, Cloneable {
     String ID_ = "";
     String PW_ = "";
     int login_ = 0; //0:로그인 시도중, 1:로그인 완료, 2:등록
 
-    user_(String ID_, String PW_, int login_) throws NoSuchAlgorithmException {
-        this.ID_ = ID_;
-        setPW_(PW_);
-        this.login_ = login_;
+    user_SIGN(String ID_, String PW_, int login_) throws NoSuchAlgorithmException {
+        if (login_ == 0 || login_ == 2){
+            this.ID_ = ID_;
+            setPW_(PW_);
+            this.login_ = login_;
+        }
     }
 
     private void setPW_(String password_) throws NoSuchAlgorithmException {
@@ -63,7 +80,7 @@ class user_ implements Serializable, Cloneable {
         return sb.toString();
     }
 
-    protected user_ clone() throws CloneNotSupportedException {
-        return (user_) super.clone();
+    protected user_SIGN clone() throws CloneNotSupportedException {
+        return (user_SIGN) super.clone();
     }
 }

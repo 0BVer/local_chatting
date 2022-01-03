@@ -10,8 +10,7 @@ import java.util.ArrayList;
 
 class Server_DATA {
     final Socket Client_sock;
-    int user_INDEX = 0;
-    String USER_ID = "";
+    int INDEX_ = 0;
     boolean login_NOW = false;
     ObjectOutputStream toClient_Obj;
 
@@ -23,8 +22,9 @@ class Server_DATA {
 
 public class ChatServer extends Thread {
     Server_DATA Client_DATA;
+    user_DATA USER_DATA;
     private final Socket sock;
-    private static final ArrayList<String> Particiants = new ArrayList<>(10); //클라이언트 이름 담는 배열 (공개)
+    private static final ArrayList<user_DATA> Particiants = new ArrayList<>(10); //클라이언트 이름 담는 배열 (공개)
     private static final ArrayList<Server_DATA> Connected_Clients = new ArrayList<>(10); //클라이언트 소켓을 담는 배열 (비공개)
 
     private static final int SALT_SIZE = 16;
@@ -36,16 +36,16 @@ public class ChatServer extends Thread {
 
     private static int user_INDEX = 0;
 
-    public void ECHO_CONNECT(String user_INDEX, boolean connect_) throws IOException {
+    public void ECHO_CONNECT(user_DATA USER_DATA, boolean connect_) throws IOException {
         Server_DATA temp_DATA = null;
         synchronized (ChatServer.Connected_Clients) {
             synchronized (ChatServer.Particiants) {
                 if (!connect_)
-                    if (!Particiants.remove(user_INDEX))
-                        System.out.println(user_INDEX + " : P remove fail");
+                    if (!Particiants.remove(USER_DATA))
+                        System.out.println(USER_DATA.INDEX_ + " : P remove fail");
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
-                    //    d.toClient_Obj.writeObject(new login_users(user_INDEX, connect_, (ArrayList) ChatServer.Particiants.clone()));
+                    //    d.toClient_Obj.writeObject(new login_users(INDEX_, connect_, (ArrayList) ChatServer.Particiants.clone()));
                     //    d.toClient_Obj.flush();
                     } else {
                         temp_DATA = d;
@@ -70,8 +70,8 @@ public class ChatServer extends Thread {
 
             while (true) { //수신을 기다리는 부분
                 Object temp_Object = fromClient_Obj.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
-                if (temp_Object instanceof user_) { //전달받은 객체가 사용자 타입일때
-                    get_user_(((user_) temp_Object));
+                if (temp_Object instanceof user_SIGN) { //전달받은 객체가 사용자 타입일때
+                    get_user_(((user_SIGN) temp_Object));
                 } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                     get_chat_((chat_) temp_Object);
                 }
@@ -83,7 +83,7 @@ public class ChatServer extends Thread {
         } finally {
             try {
                 if (Client_DATA.login_NOW) {
-                    ECHO_CONNECT(String.valueOf(Client_DATA.user_INDEX), false);
+                    ECHO_CONNECT(this.USER_DATA, false);
                 }
                 if (sock != null) { //클라이언트가 접속을 종료했을때 소켓을 지우는 부분
 //                    remove(sock);
@@ -118,12 +118,11 @@ public class ChatServer extends Thread {
 //    }
 
     // 클라이언트로 부터 받은 객체가 user_
-    private void get_user_(user_ temp_USER) throws Exception {
+    private void get_user_(user_SIGN temp_USER) throws Exception {
         System.out.println(temp_USER.ID_ + "----");
         if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
-            Client_DATA.user_INDEX = get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
-            System.out.println(Client_DATA.user_INDEX);
-            if (Client_DATA.user_INDEX != 0) {
+            Client_DATA.INDEX_ = get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
+            if (Client_DATA.INDEX_ != 0) {
                 synchronized (ChatServer.Connected_Clients) {
                     if (ChatServer.Connected_Clients.size() >= 10) {
                         Client_DATA.toClient_Obj.writeObject(new command(1, false, "서버의 정원이 가득 찼습니다."));
@@ -131,19 +130,22 @@ public class ChatServer extends Thread {
                         System.out.println(sock + " : 수용인원 초과로 로그인 실패");
                         return;
                     }
+                    this.USER_DATA = new user_DATA(Client_DATA.INDEX_, temp_USER.ID_, temp_USER.ID_);
                     Client_DATA.login_NOW = true;
-                    Client_DATA.USER_ID = temp_USER.ID_;
                     ChatServer.Connected_Clients.add(Client_DATA);
-                    Client_DATA.toClient_Obj.writeObject(new command(1, true, temp_USER.ID_));
+                    Client_DATA.toClient_Obj.writeObject(new command(1, true, USER_DATA.ID_));
                     Client_DATA.toClient_Obj.flush();
+                    Client_DATA.toClient_Obj.writeObject(new user_DATA(this.USER_DATA.INDEX_, this.USER_DATA.ID_, this.USER_DATA.NN_));
+                    Client_DATA.toClient_Obj.flush();
+
                 }
                 synchronized (ChatServer.Particiants) {
-                    ChatServer.Particiants.add(String.valueOf(Client_DATA.user_INDEX));
+                    ChatServer.Particiants.add(this.USER_DATA);
                     //Client_DATA.toClient_Obj.writeObject(new login_users(temp_USER.ID_, true, ChatServer.Particiants));
                     Client_DATA.toClient_Obj.flush();
                 }
 
-                ECHO_CONNECT(String.valueOf(Client_DATA.user_INDEX), true);
+                ECHO_CONNECT(this.USER_DATA, true);
 
                 System.out.println(sock + " : 로그인 성공");
             } else {
@@ -182,7 +184,7 @@ public class ChatServer extends Thread {
             synchronized (Connected_Clients) {
                 db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, false, temp_CHAT.chat_TEXT_);
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
-                    if (sock != d.Client_sock && temp_CHAT.RECEIVER_INDEX == d.user_INDEX) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
+                    if (sock != d.Client_sock && temp_CHAT.RECEIVER_INDEX == d.INDEX_) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
                         d.toClient_Obj.writeObject(temp_CHAT);
                         d.toClient_Obj.flush();
                         break;

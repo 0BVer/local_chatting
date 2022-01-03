@@ -6,10 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 
 public class CLIENT_CONTROLLER {
     SIGNIN_GUI SIGN_IN_VIEW;
@@ -23,11 +20,10 @@ public class CLIENT_CONTROLLER {
     ObjectOutputStream toServer_Obj;
     ObjectInputStream fromServer_OBJ;
 
-    int user_INDEX = 0;
-    String USER_ID = "";
+    String ID_ = "";
 
+    user_DATA MY_DATA;
     LinkedList<chat_> CHAT_LIST = new LinkedList();
-    ArrayList<String> Participant = new ArrayList<>();
 
     CLIENT_CONTROLLER(){
         SIGN_IN_VIEW = new SIGNIN_GUI();
@@ -53,13 +49,14 @@ public class CLIENT_CONTROLLER {
                     if (temp_Object instanceof command) { //전달받은 객체가 명령어 타입일때
                         get_command_((command) temp_Object);
                     } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
-//                        get_chat_((chat_) temp_Object);
+                        get_chat_((chat_) temp_Object);
 //                    } else if (temp_Object instanceof login_users) {
 //                        get_login_users_((login_users) temp_Object);
+                    } else if (temp_Object instanceof user_DATA) { //전달받은 객체가 명령어 타입일때
+                        get_user_DATA_((user_DATA) temp_Object);
                     }
                 }
-            } catch (IOException | ClassNotFoundException ex) {
-
+            } catch (IOException | ClassNotFoundException | CloneNotSupportedException ex) {
                 System.out.println("연결 종료 (" + ex + ")");
             } finally {
                 try {
@@ -76,8 +73,9 @@ public class CLIENT_CONTROLLER {
 
     private void get_command_(command temp_COMMAND) throws IOException {
         if (temp_COMMAND.command_type == 1) { //클라이언트의 로그인에 대한 응답
+            System.out.println(temp_COMMAND.message);
             if (temp_COMMAND.state) {
-                USER_ID = temp_COMMAND.message;
+                this.ID_ = temp_COMMAND.message;
                 LOGIN_NOW = true;
                 SIGN_IN_VIEW.setVisible(false);
                 CHAT_VIEW.setVisible(true);
@@ -98,17 +96,20 @@ public class CLIENT_CONTROLLER {
         }
     }
 
-//    private void get_chat_(chat_ temp_CHAT) {
-//        synchronized (CHAT_LIST) {
-//            CHAT_LIST.addFirst(temp_CHAT);
-//        }
-//        if (temp_CHAT.ID_.compareTo("SERVER ALERT") == 0)
-//            create_CHAT_BOX_(0, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
-//        else if (temp_CHAT.SILENT.compareTo("") == 0)
-//            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, false);
-//        else
-//            create_CHAT_BOX_(2, temp_CHAT.ID_ + " | " + temp_CHAT.upload_TIME_, temp_CHAT.chat_TEXT_, true);
-//    }
+    private void get_user_DATA_(user_DATA temp_USER_DATA) throws CloneNotSupportedException {
+        if (this.ID_ == temp_USER_DATA.ID_){
+            MY_DATA = temp_USER_DATA.clone();
+        } else {
+            Participant.add(temp_USER_DATA.clone());
+        }
+    }
+
+    private void get_chat_(chat_ temp_CHAT) {
+        synchronized (CHAT_LIST) {
+            CHAT_LIST.addFirst(temp_CHAT);
+        }
+        CHAT_VIEW.CHATBOX_TA.append(temp_CHAT.SENDER_INDEX + " -> " + temp_CHAT.RECEIVER_INDEX + " : " + temp_CHAT.chat_TEXT_+"\n");
+    }
 
 /*    private void get_login_users_(login_users temp_LOGIN_USERS){
         String alert_message = "";
@@ -141,7 +142,7 @@ public class CLIENT_CONTROLLER {
                 } else if (SIGN_IN_VIEW.PW_TF.getText().length() == 0) {
                     SIGN_IN_VIEW.WARNING_LB.setText("PW를 입력해주십시오.");
                 } else {
-                    toServer_Obj.writeObject(new user_(SIGN_IN_VIEW.ID_TF.getText(), SIGN_IN_VIEW.PW_TF.getText(), 0).clone());
+                    toServer_Obj.writeObject(new user_SIGN(SIGN_IN_VIEW.ID_TF.getText(), SIGN_IN_VIEW.PW_TF.getText(), 0).clone());
                     toServer_Obj.flush();
                 }
             } else if (e.getSource()== SIGN_IN_VIEW.SIGN_MODE_BT){ //로그인 창 가입 버튼
@@ -169,7 +170,7 @@ public class CLIENT_CONTROLLER {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW와 PW Confirm이 일치하지 않습니다.");
                 } else {
                     SIGN_UP_VIEW.WARNING_LB.setText("");
-                    toServer_Obj.writeObject(new user_(SIGN_UP_VIEW.ID_TF.getText(), SIGN_UP_VIEW.PW_TF.getText(), 2));
+                    toServer_Obj.writeObject(new user_SIGN(SIGN_UP_VIEW.ID_TF.getText(), SIGN_UP_VIEW.PW_TF.getText(), 2));
                     toServer_Obj.flush();
                 }
             }
@@ -186,17 +187,86 @@ public class CLIENT_CONTROLLER {
             //        String time_;
             if (CHAT_VIEW.CHAT_TF.getText().length() > 0) {
 //            time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
-                int reseiver_INDEX = 0;
+                int reseiver_INDEX = 55;
                 boolean ISIT_group = false;
                 chat_ temp_chat = null;
-                toServer_Obj.writeObject(temp_chat= new chat_(user_INDEX, reseiver_INDEX, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
+                toServer_Obj.writeObject(temp_chat= new chat_(MY_DATA.INDEX_, reseiver_INDEX, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
                 toServer_Obj.flush();
                 CHAT_LIST.addFirst(temp_chat);
+                CHAT_VIEW.CHATBOX_TA.append(MY_DATA.INDEX_ + " -> " + reseiver_INDEX + " : " + CHAT_VIEW.CHAT_TF.getText() + "\n");
+                CHAT_VIEW.CHAT_TF.setText("");
             }
         } catch (IOException ex){
 
         }
     }
+
+    Set<user_DATA> Participant = new Set<user_DATA>() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @Override
+        public Iterator<user_DATA> iterator() {
+            return null;
+        }
+
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return null;
+        }
+
+        @Override
+        public boolean add(user_DATA user_data) {
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends user_DATA> c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+    };
 
     public static void main(String[] args) {
         new CLIENT_CONTROLLER();
