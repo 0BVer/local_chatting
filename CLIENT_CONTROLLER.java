@@ -268,7 +268,11 @@ public class CLIENT_CONTROLLER {
             //        String time_;
             if (CHAT_VIEW.CHAT_TF.getText().length() > 0) {
 //            time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
-                int reseiver_INDEX = 55;
+                int reseiver_INDEX = 0;
+                if (CHAT_VIEW.RECEIVER_TF.getText().length() != 0){
+                    //TODO: SEARCH USER INDEX
+                    reseiver_INDEX = Integer.parseInt(CHAT_VIEW.RECEIVER_TF.getText());
+                }
                 boolean ISIT_group = false;
                 chat_ temp_chat = null;
                 toServer_Obj.writeObject(temp_chat = new chat_(MY_DATA.INDEX_, reseiver_INDEX, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
