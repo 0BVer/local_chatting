@@ -182,7 +182,7 @@ public class CLIENT_CONTROLLER {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW Confirm을 입력해주십시오.");
                 } else if (SIGN_UP_VIEW.PW_TF.getText().compareTo(SIGN_UP_VIEW.PWCF_TF.getText()) != 0) {
                     SIGN_UP_VIEW.WARNING_LB.setText("PW와 PW Confirm이 일치하지 않습니다.");
-                } else if (SIGN_UP_VIEW.PN_RESULT_LB.getText().length() == 0) {
+                } else if (SIGN_UP_VIEW.PN_RESULT_LB.getText().length() == 0) { //TODO: 우편번호 전송 및 처리 추가
                     SIGN_UP_VIEW.WARNING_LB.setText("우편번호를 입력해주십시오.");
                 } else {
                     SIGN_UP_VIEW.WARNING_LB.setText("");
