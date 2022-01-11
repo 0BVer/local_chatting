@@ -182,7 +182,6 @@ public class ChatServer extends Thread {
             }
         } else {
             synchronized (Connected_Clients) {
-                db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, false, temp_CHAT.chat_TEXT_);
                 if (temp_CHAT.RECEIVER_INDEX == 0){
                     for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
                         if (sock != d.Client_sock) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
@@ -191,6 +190,7 @@ public class ChatServer extends Thread {
                         }
                     }
                 } else {
+                    db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, false, temp_CHAT.chat_TEXT_);
                     for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
                         if (sock != d.Client_sock && temp_CHAT.RECEIVER_INDEX == d.INDEX_) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
                             d.toClient_Obj.writeObject(temp_CHAT);
