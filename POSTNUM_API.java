@@ -13,8 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class ApiExplorer
-{
+public class POSTNUM_API {
     //* 공공데이타포털(http://www.data.go.kr) 오픈 API 이용
 
     // 서비스명 : 통합검색 5자리 우편번호 조회서비스
@@ -26,18 +25,17 @@ public class ApiExplorer
     // [out] v[i*3 +0]=우편번호, v[i*3 +1]=도로명주소, v[i*3 +2]=지번주소, v.Count/3=표시할 목록 수
     // [out] n[0]=검색한 전체 목록(우편번호) 개수, n[1]=읽어온 페이지(1부터)
     // 반환값 : 에러메시지, null == OK
-    public static String find(String s, List<String> v, int[] n)
-    {
+
+    public static String find(String s, int p, List<String> v, int[] n) {
         HttpURLConnection con = null;
-        int p = 1, l = 10;
-        try
-        {
+        int l = 10;
+        try {
             URL url = new URL(
                     "http://openapi.epost.go.kr/postal/retrieveNewAdressAreaCdSearchAllService/retrieveNewAdressAreaCdSearchAllService/getNewAddressListAreaCdSearchAll"
                             + "?ServiceKey=PLJKP0eX7qva%2FubedawARdU84dY3POlEGpcCB6ZgcgFb2tsJJj%2FsRIFESAl85234d8Dxlk4nKNnqkBAlk58epw%3D%3D" // 서비스키
                             + "&countPerPage=" + l // 페이지당 출력될 개수를 지정(최대 50)
                             + "&currentPage=" + p // 출력될 페이지 번호
-                            + "&srchwrd=" + URLEncoder.encode(s,"UTF-8") // 검색어
+                            + "&srchwrd=" + URLEncoder.encode(s, "UTF-8") // 검색어
             );
 
             con = (HttpURLConnection) url.openConnection();
@@ -53,60 +51,50 @@ public class ApiExplorer
             String nn;
             Node nd;
             NodeList ns = doc.getElementsByTagName("cmmMsgHeader");
+
             if (ns.getLength() > 0)
-                for (nd = ns.item(0).getFirstChild(); nd != null; nd = nd.getNextSibling())
-                {
+                for (nd = ns.item(0).getFirstChild(); nd != null; nd = nd.getNextSibling()) {
                     nn = nd.getNodeName();
 
-                    if (!bOk)
-                    {
+                    if (!bOk) {
                         if (nn.equals("successYN")) // 성공 여부
                         {
                             if (nd.getTextContent().equals("Y")) bOk = true; // 검색 성공
-                        }
-                        else if (nn.equals("errMsg")) // 에러 메시지
+                        } else if (nn.equals("errMsg")) // 에러 메시지
                         {
                             s = nd.getTextContent();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         if (nn.equals("totalCount")) // 전체 검색수
                         {
                             n[0] = Integer.parseInt(nd.getTextContent());
-                        }
-                        else if (nn.equals("currentPage")) // 현재 페이지 번호
+                        } else if (nn.equals("currentPage")) // 현재 페이지 번호
                         {
                             n[1] = Integer.parseInt(nd.getTextContent());
                         }
                     }
                 }
 
-            if (bOk)
-            {
+            if (bOk) {
                 ns = doc.getElementsByTagName("newAddressListAreaCdSearchAll");
                 for (p = 0; p < ns.getLength(); p++)
-                    for (nd = ns.item(p).getFirstChild(); nd != null; nd = nd.getNextSibling())
-                    {
+                    for (nd = ns.item(p).getFirstChild(); nd != null; nd = nd.getNextSibling()) {
                         // nn = nd.getNodeName();
                         // if (nn.equals("zipNo") || // 우편번호
                         //  nn.equals("lnmAdres") || // 도로명 주소
                         //  nn.equals("rnAdres")) // 지번 주소
                         // {
                         v.add(nd.getTextContent());
-                        System.out.println(nd.getTextContent());
+//                        System.out.println(nd.getTextContent());
                         // }
                     }
             }
 
-            if (s == null)
-            { // OK!
+            if (s == null) { // OK!
                 if (v.size() < 3)
                     s = "검색결과가 없습니다.";
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             s = e.getMessage();
         }
 
@@ -116,9 +104,7 @@ public class ApiExplorer
         return s;
     }
 
-    public static void main(String[] args) {
-        List<String> add = new ArrayList<>(10);
-        int [] n = new int[2];
-        System.out.println(find("안양판교로", add, n));
+    POSTNUM_API(String s, int p, List<String> v, int[] n){
+        find(s, p, v, n);
     }
 }

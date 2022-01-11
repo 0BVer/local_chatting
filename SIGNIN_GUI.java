@@ -47,4 +47,7 @@ public class SIGNIN_GUI extends JFrame {
         CP.add(WARNING_LB);
         setVisible(true);
     }
+
+    public static void main(String[] args) {
+        new  SIGNIN_GUI();    }
 }
