@@ -15,6 +15,7 @@ public class CLIENT_CONTROLLER {
     CHAT_GUI CHAT_VIEW;
     POSTNUM_API_GUI POSTNUM_VIEW;
 
+    CLIENT_MODEL client_Model;
     POSTNUM_API postnum_API;
 
     private boolean LOGIN_NOW = false;
@@ -27,9 +28,11 @@ public class CLIENT_CONTROLLER {
     String ID_ = "";
 
     user_DATA MY_DATA;
+    user_DATA temp_DATA;
     LinkedList<chat_> CHAT_LIST = new LinkedList();
 
     CLIENT_CONTROLLER() {
+        client_Model = new CLIENT_MODEL();
         SIGN_IN_VIEW = new SIGNIN_GUI();
         SIGN_UP_VIEW = new SIGNUP_GUI();
         CHAT_VIEW = new CHAT_GUI();
@@ -114,7 +117,7 @@ public class CLIENT_CONTROLLER {
         if (this.ID_ == temp_USER_DATA.ID_) {
             MY_DATA = temp_USER_DATA.clone();
         } else {
-            Participant.add(temp_USER_DATA.clone());
+            client_Model.participant.user_LIST.add(temp_USER_DATA.clone());
         }
     }
 
@@ -122,7 +125,7 @@ public class CLIENT_CONTROLLER {
         synchronized (CHAT_LIST) {
             CHAT_LIST.addFirst(temp_CHAT);
         }
-        CHAT_VIEW.CHATBOX_TA.append(temp_CHAT.SENDER_INDEX + " -> " + temp_CHAT.RECEIVER_INDEX + " : " + temp_CHAT.chat_TEXT_ + "\n");
+        CHAT_VIEW.CHATBOX_TA.append(temp_CHAT.SENDER + " -> " + temp_CHAT.RECEIVER + " : " + temp_CHAT.chat_TEXT_ + "\n");
     }
 
 /*    private void get_login_users_(login_users temp_LOGIN_USERS){
@@ -268,90 +271,24 @@ public class CLIENT_CONTROLLER {
             //        String time_;
             if (CHAT_VIEW.CHAT_TF.getText().length() > 0) {
 //            time_ = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm"));
-                int reseiver_INDEX = 0;
                 if (CHAT_VIEW.RECEIVER_TF.getText().length() != 0){
                     //TODO: SEARCH USER INDEX
-                    reseiver_INDEX = Integer.parseInt(CHAT_VIEW.RECEIVER_TF.getText());
+//                    temp_DATA =
+                } else {
+                    temp_DATA = new user_DATA(0, "GLOBAL", "GLOBAL");
                 }
                 boolean ISIT_group = false;
                 chat_ temp_chat = null;
-                toServer_Obj.writeObject(temp_chat = new chat_(MY_DATA.INDEX_, reseiver_INDEX, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
+                toServer_Obj.writeObject(temp_chat = new chat_(MY_DATA, temp_DATA, ISIT_group, CHAT_VIEW.CHAT_TF.getText()));
                 toServer_Obj.flush();
                 CHAT_LIST.addFirst(temp_chat);
-                CHAT_VIEW.CHATBOX_TA.append(MY_DATA.INDEX_ + " -> " + reseiver_INDEX + " : " + CHAT_VIEW.CHAT_TF.getText() + "\n");
+                CHAT_VIEW.CHATBOX_TA.append(MY_DATA.NN_ + " ➜ " + temp_DATA.NN_ + " : " + CHAT_VIEW.CHAT_TF.getText() + "\n");
                 CHAT_VIEW.CHAT_TF.setText("");
             }
         } catch (IOException ex) {
-
+            System.out.println(ex);
         }
     }
-
-    Set<user_DATA> Participant = new Set<user_DATA>() {
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            return false;
-        }
-
-        @Override
-        public Iterator<user_DATA> iterator() {
-            return null;
-        }
-
-        @Override
-        public Object[] toArray() {
-            return new Object[0];
-        }
-
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return null;
-        }
-
-        @Override
-        public boolean add(user_DATA user_data) {
-            return false;
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            return false;
-        }
-
-        @Override
-        public boolean containsAll(Collection<?> c) {
-            return false;
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends user_DATA> c) {
-            return false;
-        }
-
-        @Override
-        public boolean retainAll(Collection<?> c) {
-            return false;
-        }
-
-        @Override
-        public boolean removeAll(Collection<?> c) {
-            return false;
-        }
-
-        @Override
-        public void clear() {
-
-        }
-    };
 
     public static void main(String[] args) {
         new CLIENT_CONTROLLER();

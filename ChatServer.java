@@ -71,7 +71,7 @@ public class ChatServer extends Thread {
             while (true) { //수신을 기다리는 부분
                 Object temp_Object = fromClient_Obj.readObject(); //Socket로부터 받은 데이터를 Object로 수신합니다.
                 if (temp_Object instanceof user_SIGN) { //전달받은 객체가 사용자 타입일때
-                    get_user_(((user_SIGN) temp_Object));
+                    get_user_SIGN(((user_SIGN) temp_Object));
                 } else if (temp_Object instanceof chat_) { //전달받은 객체가 채팅타입일 때
                     get_chat_((chat_) temp_Object);
                 }
@@ -118,7 +118,7 @@ public class ChatServer extends Thread {
 //    }
 
     // 클라이언트로 부터 받은 객체가 user_
-    private void get_user_(user_SIGN temp_USER) throws Exception {
+    private void get_user_SIGN(user_SIGN temp_USER) throws Exception {
         System.out.println(temp_USER.ID_ + "----");
         if (temp_USER.login_ == 0) { //클라이언트의 로그인 시도
             Client_DATA.INDEX_ = get_User_JDBC(temp_USER.ID_, temp_USER.PW_.getBytes());
@@ -172,7 +172,7 @@ public class ChatServer extends Thread {
 
         if (temp_CHAT.ISIT_group) {
             synchronized (Connected_Clients) {
-                db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, true, temp_CHAT.chat_TEXT_);
+                db.Insert_chat(temp_CHAT.SENDER.INDEX_, temp_CHAT.RECEIVER.INDEX_, true, temp_CHAT.chat_TEXT_);
                 for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열을 반복
                     if (sock != d.Client_sock) { //보낸 클라이언트를 제외하는 부분
                         d.toClient_Obj.writeObject(temp_CHAT);
@@ -182,7 +182,7 @@ public class ChatServer extends Thread {
             }
         } else {
             synchronized (Connected_Clients) {
-                if (temp_CHAT.RECEIVER_INDEX == 0){
+                if (temp_CHAT.RECEIVER.INDEX_ == 0){
                     for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
                         if (sock != d.Client_sock) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
                             d.toClient_Obj.writeObject(temp_CHAT);
@@ -190,9 +190,9 @@ public class ChatServer extends Thread {
                         }
                     }
                 } else {
-                    db.Insert_chat(temp_CHAT.SENDER_INDEX, temp_CHAT.RECEIVER_INDEX, false, temp_CHAT.chat_TEXT_);
+                    db.Insert_chat(temp_CHAT.SENDER.INDEX_, temp_CHAT.RECEIVER.INDEX_, false, temp_CHAT.chat_TEXT_);
                     for (Server_DATA d : ChatServer.Connected_Clients) { //클라이언트 배열 반복
-                        if (sock != d.Client_sock && temp_CHAT.RECEIVER_INDEX == d.INDEX_) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
+                        if (sock != d.Client_sock && temp_CHAT.RECEIVER.INDEX_ == d.INDEX_) { //보낸 클라이언트를 제외하고 귓속말 상대를 찾는 부분
                             d.toClient_Obj.writeObject(temp_CHAT);
                             d.toClient_Obj.flush();
                             break;

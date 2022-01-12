@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class command implements Serializable, Cloneable{
-    int command_type;
+    int command_type; //1 : 로그인 시도, 2 : 가입 시도, 11 : 사용자 정보 요청
     boolean state;
     String message;
 
@@ -17,14 +17,14 @@ public class command implements Serializable, Cloneable{
 }
 
 class chat_ implements Serializable {
-    int SENDER_INDEX;
-    int RECEIVER_INDEX;
+    user_DATA SENDER;
+    user_DATA RECEIVER;
     boolean ISIT_group = false;
     String chat_TEXT_ = "";
 
-    chat_(int SENDER_INDEX, int RECEIVER_INDEX, boolean ISIT_group, String chat_TEXT_){
-        this.SENDER_INDEX = SENDER_INDEX;
-        this.RECEIVER_INDEX = RECEIVER_INDEX;
+    chat_(user_DATA SENDER, user_DATA RECEIVER, boolean ISIT_group, String chat_TEXT_){
+        this.SENDER = SENDER;
+        this.RECEIVER = RECEIVER;
         this.ISIT_group = ISIT_group;
         this.chat_TEXT_ = chat_TEXT_;
     }

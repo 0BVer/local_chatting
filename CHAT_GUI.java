@@ -27,6 +27,7 @@ public class CHAT_GUI extends JFrame {
 
         CHATBOX_TA = new JTextArea();
         CHATBOX_TA.setEditable(false);
+        CHATBOX_TA.setLineWrap(true);
 
         CHAT_MAINBOX_SP = new JScrollPane(CHATBOX_TA);
         CHAT_MAINBOX_SP.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
